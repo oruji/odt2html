@@ -7,12 +7,18 @@ import org.jopendocument.dom.ODPackage;
 
 public class App {
 	public static void main(String[] args) throws IOException {
-		ODPackage p = new ODPackage(new File("/home/aminpy/durud.odt"));
+		ODPackage p = new ODPackage(new File("test.odt"));
+
+		StringBuilder outputHTML = new StringBuilder("");
 
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
-			System.out.println(p.getTextDocument().getParagraph(i)
+			outputHTML.append("<p>\n\t");
+			outputHTML.append(p.getTextDocument().getParagraph(i)
 					.getCharacterContent());
+			outputHTML.append("\n</p>\n");
 		}
+
+		System.out.println(outputHTML);
 
 		// System.out.println(p.getTextDocument().getParagraph(0)
 		// .getCharacterContent(true));
