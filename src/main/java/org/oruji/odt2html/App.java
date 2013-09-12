@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.jopendocument.dom.ODPackage;
 
+
 public class App {
 	public static void main(String[] args) throws IOException {
 		ODPackage p = new ODPackage(new File("test.odt"));
@@ -13,8 +14,12 @@ public class App {
 
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
 			outputHTML.append("<p>\n\t");
-			outputHTML.append(p.getTextDocument().getParagraph(i)
-					.getCharacterContent());
+			outputHTML.append(p.getTextDocument().getParagraph(i).getCharacterContent());
+			
+			for (int j = 0; j < p.getTextDocument().getParagraph(i).getElement().getContent().size(); j++) {
+				System.out.println(p.getTextDocument().getParagraph(i).getElement().getContent().get(j));
+			}
+				
 			outputHTML.append("\n</p>\n");
 		}
 
