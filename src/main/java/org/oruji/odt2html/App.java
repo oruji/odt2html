@@ -3,27 +3,22 @@ package org.oruji.odt2html;
 import java.io.File;
 import java.io.IOException;
 
+import org.jdom.Element;
 import org.jopendocument.dom.ODPackage;
-
+import org.jopendocument.dom.text.Paragraph;
 
 public class App {
 	public static void main(String[] args) throws IOException {
 		ODPackage p = new ODPackage(new File("test.odt"));
 
-		StringBuilder outputHTML = new StringBuilder("");
-
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
-			outputHTML.append("<p>\n\t");
-			outputHTML.append(p.getTextDocument().getParagraph(i).getCharacterContent());
-			
-			for (int j = 0; j < p.getTextDocument().getParagraph(i).getElement().getContent().size(); j++) {
-				System.out.println(p.getTextDocument().getParagraph(i).getElement().getContent().get(j));
-			}
-				
-			outputHTML.append("\n</p>\n");
-		}
+			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
+			Element currentElement = currentParagraph.getElement();
 
-		System.out.println(outputHTML);
+			for (int j = 0; j < currentElement.getContent().size(); j++) {
+				currentElement.getContent().get(j);
+			}
+		}
 
 		// System.out.println(p.getTextDocument().getParagraph(0)
 		// .getCharacterContent(true));
