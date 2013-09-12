@@ -3,6 +3,8 @@ package org.oruji.odt2html;
 import java.io.File;
 import java.io.IOException;
 
+import org.jdom.Attribute;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.text.Paragraph;
@@ -16,7 +18,13 @@ public class App {
 			Element currentElement = currentParagraph.getElement();
 
 			for (int j = 0; j < currentElement.getContent().size(); j++) {
-				currentElement.getContent().get(j);
+				Element currentContent = (Element) currentElement.getContent().get(j);
+				Attribute attribute = (Attribute) currentContent.getAttributes().get(0);
+				
+				if (attribute.getValue().equals("T10"))
+					System.out.println("bold" + currentContent.getValue());
+				else 
+					System.out.println(currentContent.getValue());
 			}
 		}
 
