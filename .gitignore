@@ -4,4 +4,5 @@
 .project
 .classpath
 target
-test.odt_FILES
+*.odt_FILES
+*.odt

@@ -10,35 +10,42 @@ import org.jopendocument.dom.text.Paragraph;
 
 public class App {
 	public static void main(String[] args) throws IOException {
+		StringBuilder outHTML = new StringBuilder("");
 		ODPackage p = new ODPackage(new File("test.odt"));
 
 		p.getTextDocument().getContentDocument().getRootElement();
 
+		// Paragraph Iteration
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
 			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
+			// Contents of Paragraph Iteration
 			for (int j = 0; j < currentElement.getContent().size(); j++) {
 				Element currentContent = null;
 				Text currentText = null;
 				String curStr = currentElement.getContent().get(j).toString();
 
-				if (curStr.startsWith("[Element: ")) {
+				if (curStr.startsWith("[Text: ")) {
+					currentText = (Text) currentElement.getContent().get(j);
+					outHTML.append(currentText.getValue());
+
+				} else if (curStr.startsWith("[Element: ")) {
 					currentContent = (Element) currentElement.getContent().get(
 							j);
-					System.out.println(currentContent.getValue());
-				}
 
-				else if (curStr.startsWith("[Text: ")) {
-					currentText = (Text) currentElement.getContent().get(j);
-					System.out.println(currentText.getValue());
-				}
+					outHTML.append("<" + currentContent.getName() + ">"
+							+ currentContent.getValue() + "</"
+							+ currentContent.getName() + ">");
 
-				// Attribute attribute = (Attribute) currentContent
-				// .getAttributes().get(0);
+					// Attribute attribute = (Attribute) currentContent
+					// .getAttributes().get(0);
+				}
 
 			}
 		}
+
+		System.out.println(outHTML);
 
 		// System.out.println(p.getTextDocument().getParagraph(0)
 		// .getCharacterContent(true));
