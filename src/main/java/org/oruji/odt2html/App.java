@@ -11,48 +11,50 @@ import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.text.Paragraph;
 
 public class App {
+	private static StringBuilder outHTML = new StringBuilder("");
+	private static ODPackage p;
+	private static Element automaticStyle;
 
-	public static List<Attribute> getStyleList(String attName,
-			Element automaticStyle) {
+	public static void recursiveElement(Element element) {
+		Element currentContent = null;
+		Text currentText = null;
+		String createdStyle = null;
 
-		for (Object el : automaticStyle.getContent()) {
-			for (Object att : ((Element) el).getAttributes()) {
-				if (((Attribute) att).getName().equals("name")
-						&& ((Attribute) att).getValue().equals(attName)) {
-					((Attribute) att).getName();
-					return ((Element) ((Element) el).getContent().get(0))
-							.getAttributes();
-				}
+		if (element.getContent().size() > 0) {
+			String curStr = element.getContent().get(0).toString();
+
+			if (!curStr.startsWith("[Text: ")) {
+				currentContent = (Element) element.getContent().get(0);
+				recursiveElement(currentContent);
+				return;
+			} else {
+				currentText = (Text) element.getContent().get(0);
 			}
 		}
 
-		return null;
-	}
+		String myAtt = null;
 
-	public static String createStyle(List<Attribute> attList) {
-		StringBuilder outStr = new StringBuilder("");
-		outStr.append("style='");
+		currentContent = ((Element) currentText.getParent());
 
-		for (Attribute att : attList) {
-			if (att.getNamespacePrefix().equals("fo")) {
-				outStr.append(att.getName() + ":" + att.getValue() + ";");
-			}
+		if (currentContent.getAttributes().size() > 0) {
+			myAtt = ((Attribute) currentContent.getAttributes().get(0))
+					.getValue();
 		}
 
-		outStr.append("'");
+		createdStyle = createStyle(getStyleList(myAtt, automaticStyle));
 
-		return outStr.toString();
+		outHTML.append("<" + currentContent.getName() + " " + createdStyle
+				+ ">" + element.getValue() + "</" + currentContent.getName()
+				+ ">");
 	}
 
 	public static void main(String[] args) throws IOException {
-		StringBuilder outHTML = new StringBuilder("");
+		// StringBuilder outHTML = new StringBuilder("");
 		String createdStyle = null;
-		ODPackage p = new ODPackage(new File("test.odt"));
+		p = new ODPackage(new File("test.odt"));
 
-		Element automaticStyle = (Element) p.getTextDocument()
-				.getContentDocument().getRootElement().getContent().get(2);
-
-		automaticStyle.getContent();
+		automaticStyle = (Element) p.getTextDocument().getContentDocument()
+				.getRootElement().getContent().get(2);
 
 		// Paragraph Iteration
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
@@ -60,30 +62,37 @@ public class App {
 			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
+			recursiveElement(currentParagraph.getElement());
+
 			// Contents of Paragraph Iteration
-			for (int j = 0; j < currentElement.getContent().size(); j++) {
-				Element currentContent = null;
-				Text currentText = null;
-				String curStr = currentElement.getContent().get(j).toString();
-
-				if (curStr.startsWith("[Text: ")) {
-					currentText = (Text) currentElement.getContent().get(j);
-					outHTML.append(currentText.getValue());
-
-				} else if (curStr.startsWith("[Element: ")) {
-					currentContent = (Element) currentElement.getContent().get(
-							j);
-
-					createdStyle = createStyle(getStyleList(
-							((Attribute) currentContent.getAttributes().get(0))
-									.getValue(),
-							automaticStyle));
-
-					outHTML.append("<" + currentContent.getName() + " "
-							+ createdStyle + ">" + currentContent.getValue()
-							+ "</" + currentContent.getName() + ">");
-				}
-			}
+//			for (int j = 0; j < currentElement.getContent().size(); j++) {
+//				Element currentContent = null;
+//				Text currentText = null;
+//				String curStr = currentElement.getContent().get(j).toString();
+//
+//				if (curStr.startsWith("[Text: ")) {
+//					currentText = (Text) currentElement.getContent().get(j);
+//					outHTML.append(currentText.getValue());
+//
+//				} else if (curStr.startsWith("[Element: ")) {
+//					currentContent = (Element) currentElement.getContent().get(
+//							j);
+//
+//					String myAtt = null;
+//
+//					if (currentContent.getAttributes().size() > 0) {
+//						myAtt = ((Attribute) currentContent.getAttributes()
+//								.get(0)).getValue();
+//					}
+//
+//					createdStyle = createStyle(getStyleList(myAtt,
+//							automaticStyle));
+//
+//					outHTML.append("<" + currentContent.getName() + " "
+//							+ createdStyle + ">" + currentContent.getValue()
+//							+ "</" + currentContent.getName() + ">");
+//				}
+//			}
 			outHTML.append("</p>");
 		}
 
@@ -105,5 +114,39 @@ public class App {
 		// paragraph.setStyle("Synopsis_20_Para");
 		// paragraph.addContent("Here is my paragraph");
 		// doc.add(paragraph);
+	}
+
+	public static List<Attribute> getStyleList(String attName,
+			Element automaticStyle) {
+
+		for (Object el : automaticStyle.getContent()) {
+			for (Object att : ((Element) el).getAttributes()) {
+				if (((Attribute) att).getName().equals("name")
+						&& ((Attribute) att).getValue().equals(attName)) {
+					((Attribute) att).getName();
+					return ((Element) ((Element) el).getContent().get(0))
+							.getAttributes();
+				}
+			}
+		}
+
+		return null;
+	}
+
+	public static String createStyle(List<Attribute> attList) {
+		StringBuilder createdStyle = new StringBuilder("");
+		createdStyle.append("style='");
+
+		if (attList != null)
+			for (Attribute att : attList) {
+				if (att.getNamespacePrefix().equals("fo")) {
+					createdStyle.append(att.getName() + ":" + att.getValue()
+							+ ";");
+				}
+			}
+
+		createdStyle.append("'");
+
+		return createdStyle.toString();
 	}
 }
