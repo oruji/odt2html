@@ -2,6 +2,7 @@ package org.oruji.odt2html;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import org.jdom.Element;
 import org.jdom.Text;
@@ -9,11 +10,19 @@ import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.text.Paragraph;
 
 public class App {
+
+	public static List<String> getStyleList(String attName) {
+		return null;
+	}
+
 	public static void main(String[] args) throws IOException {
 		StringBuilder outHTML = new StringBuilder("");
 		ODPackage p = new ODPackage(new File("test.odt"));
 
-		p.getTextDocument().getContentDocument().getRootElement();
+		Element automaticStyle = (Element) p.getTextDocument()
+				.getContentDocument().getRootElement().getContent().get(2);
+
+		automaticStyle.getContent();
 
 		// Paragraph Iteration
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
@@ -41,7 +50,6 @@ public class App {
 					// Attribute attribute = (Attribute) currentContent
 					// .getAttributes().get(0);
 				}
-
 			}
 		}
 
