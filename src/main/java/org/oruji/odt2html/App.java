@@ -2,8 +2,10 @@ package org.oruji.odt2html;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jopendocument.dom.ODPackage;
@@ -11,8 +13,31 @@ import org.jopendocument.dom.text.Paragraph;
 
 public class App {
 
-	public static List<String> getStyleList(String attName) {
+	public static List<Attribute> getStyleList(String attName,
+			Element automaticStyle) {
+
+		for (Object el : automaticStyle.getContent()) {
+			for (Object att : ((Element) el).getAttributes()) {
+				if (((Attribute) att).getName().equals("name")
+						&& ((Attribute) att).getValue().equals(attName)) {
+					((Attribute) att).getName();
+					return ((Element) ((Element) el).getContent().get(0))
+							.getAttributes();
+				}
+			}
+		}
+
 		return null;
+	}
+
+	public static String createStyle(List<Attribute> attList) {
+		StringBuilder outStr = new StringBuilder("");
+		outStr.append("style='");
+
+		for (Attribute att : attList)
+			System.out.println(att);
+
+		return outStr.toString();
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -42,6 +67,9 @@ public class App {
 				} else if (curStr.startsWith("[Element: ")) {
 					currentContent = (Element) currentElement.getContent().get(
 							j);
+
+					getStyleList(((Attribute) currentContent.getAttributes()
+							.get(0)).getValue(), automaticStyle);
 
 					outHTML.append("<" + currentContent.getName() + ">"
 							+ currentContent.getValue() + "</"
