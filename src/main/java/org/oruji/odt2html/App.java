@@ -2,7 +2,6 @@ package org.oruji.odt2html;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom.Attribute;
@@ -34,14 +33,20 @@ public class App {
 		StringBuilder outStr = new StringBuilder("");
 		outStr.append("style='");
 
-		for (Attribute att : attList)
-			System.out.println(att);
+		for (Attribute att : attList) {
+			if (att.getNamespacePrefix().equals("fo")) {
+				outStr.append(att.getName() + ":" + att.getValue() + ";");
+			}
+		}
+
+		outStr.append("'");
 
 		return outStr.toString();
 	}
 
 	public static void main(String[] args) throws IOException {
 		StringBuilder outHTML = new StringBuilder("");
+		String createdStyle = null;
 		ODPackage p = new ODPackage(new File("test.odt"));
 
 		Element automaticStyle = (Element) p.getTextDocument()
@@ -51,6 +56,7 @@ public class App {
 
 		// Paragraph Iteration
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
+			outHTML.append("<p>");
 			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
@@ -68,17 +74,17 @@ public class App {
 					currentContent = (Element) currentElement.getContent().get(
 							j);
 
-					getStyleList(((Attribute) currentContent.getAttributes()
-							.get(0)).getValue(), automaticStyle);
+					createdStyle = createStyle(getStyleList(
+							((Attribute) currentContent.getAttributes().get(0))
+									.getValue(),
+							automaticStyle));
 
-					outHTML.append("<" + currentContent.getName() + ">"
-							+ currentContent.getValue() + "</"
-							+ currentContent.getName() + ">");
-
-					// Attribute attribute = (Attribute) currentContent
-					// .getAttributes().get(0);
+					outHTML.append("<" + currentContent.getName() + " "
+							+ createdStyle + ">" + currentContent.getValue()
+							+ "</" + currentContent.getName() + ">");
 				}
 			}
+			outHTML.append("</p>");
 		}
 
 		System.out.println(outHTML);
