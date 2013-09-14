@@ -3,8 +3,8 @@ package org.oruji.odt2html;
 import java.io.File;
 import java.io.IOException;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jopendocument.dom.ODPackage;
 import org.jopendocument.dom.text.Paragraph;
 
@@ -13,25 +13,30 @@ public class App {
 		ODPackage p = new ODPackage(new File("test.odt"));
 
 		p.getTextDocument().getContentDocument().getRootElement();
-		
+
 		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
 			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
 			for (int j = 0; j < currentElement.getContent().size(); j++) {
-				Element currentContent = (Element) currentElement.getContent()
-						.get(j);
-				Attribute attribute = (Attribute) currentContent
-						.getAttributes().get(0);
+				Element currentContent = null;
+				Text currentText = null;
+				String curStr = currentElement.getContent().get(j).toString();
 
-				if (attribute.getValue().equals("T10"))
-					System.out.println("bold" + currentContent.getValue());
-
-				else if (attribute.getValue().equals("T1"))
-					System.out.println("italic" + currentContent.getValue());
-
-				else
+				if (curStr.startsWith("[Element: ")) {
+					currentContent = (Element) currentElement.getContent().get(
+							j);
 					System.out.println(currentContent.getValue());
+				}
+
+				else if (curStr.startsWith("[Text: ")) {
+					currentText = (Text) currentElement.getContent().get(j);
+					System.out.println(currentText.getValue());
+				}
+
+				// Attribute attribute = (Attribute) currentContent
+				// .getAttributes().get(0);
+
 			}
 		}
 
