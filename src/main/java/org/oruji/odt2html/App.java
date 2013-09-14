@@ -93,6 +93,9 @@ public class App {
 
 		if (attList != null)
 			for (Attribute att : attList) {
+				if (att.getName().equals("font-name"))
+					createdStyle.append("font-family:" + att.getValue() + ";");
+					
 				if (att.getNamespacePrefix().equals("fo")) {
 					createdStyle.append(att.getName() + ":" + att.getValue()
 							+ ";");
