@@ -15,21 +15,19 @@ public class App {
 	private static ODPackage p;
 	private static Element automaticStyle;
 
-	public static void recursiveElement(Element element) {
+	public static void recursiveElement(Object myObj) {
 		Element currentContent = null;
 		Text currentText = null;
 		String createdStyle = null;
+		String curStr = myObj.toString();
 
-		if (element.getContent().size() > 0) {
-			String curStr = element.getContent().get(0).toString();
+		if (!curStr.startsWith("[Text: ")) {
+			if (((Element) myObj).getContent().size() > 0)
+				recursiveElement(((Element) myObj).getContent().get(0));
+			return;
 
-			if (!curStr.startsWith("[Text: ")) {
-				currentContent = (Element) element.getContent().get(0);
-				recursiveElement(currentContent);
-				return;
-			} else {
-				currentText = (Text) element.getContent().get(0);
-			}
+		} else {
+			currentText = (Text) myObj;
 		}
 
 		String myAtt = null;
@@ -44,13 +42,11 @@ public class App {
 		createdStyle = createStyle(getStyleList(myAtt, automaticStyle));
 
 		outHTML.append("<" + currentContent.getName() + " " + createdStyle
-				+ ">" + element.getValue() + "</" + currentContent.getName()
-				+ ">");
+				+ ">" + ((Text) myObj).getValue() + "</"
+				+ currentContent.getName() + ">");
 	}
 
 	public static void main(String[] args) throws IOException {
-		// StringBuilder outHTML = new StringBuilder("");
-		String createdStyle = null;
 		p = new ODPackage(new File("test.odt"));
 
 		automaticStyle = (Element) p.getTextDocument().getContentDocument()
@@ -62,60 +58,18 @@ public class App {
 			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
-			recursiveElement(currentParagraph.getElement());
-
 			// Contents of Paragraph Iteration
-//			for (int j = 0; j < currentElement.getContent().size(); j++) {
-//				Element currentContent = null;
-//				Text currentText = null;
-//				String curStr = currentElement.getContent().get(j).toString();
-//
-//				if (curStr.startsWith("[Text: ")) {
-//					currentText = (Text) currentElement.getContent().get(j);
-//					outHTML.append(currentText.getValue());
-//
-//				} else if (curStr.startsWith("[Element: ")) {
-//					currentContent = (Element) currentElement.getContent().get(
-//							j);
-//
-//					String myAtt = null;
-//
-//					if (currentContent.getAttributes().size() > 0) {
-//						myAtt = ((Attribute) currentContent.getAttributes()
-//								.get(0)).getValue();
-//					}
-//
-//					createdStyle = createStyle(getStyleList(myAtt,
-//							automaticStyle));
-//
-//					outHTML.append("<" + currentContent.getName() + " "
-//							+ createdStyle + ">" + currentContent.getValue()
-//							+ "</" + currentContent.getName() + ">");
-//				}
-//			}
+			for (int j = 0; j < currentElement.getContent().size(); j++) {
+				recursiveElement(currentElement.getContent().get(j));
+			}
+
 			outHTML.append("</p>");
 		}
 
 		System.out.println(outHTML);
-
-		// System.out.println(p.getTextDocument().getParagraph(0)
-		// .getCharacterContent(true));
-
-		// System.out.println(p.getTextDocument().getCharacterContent(true));
-
-		// ODSingleXMLDocument doc = p.toSingle();
-
-		// final Heading heading = new Heading();
-		// heading.setStyle("Movie_20_Heading");
-		// heading.addContent("Here is my title");
-		// doc.add(heading);
-		//
-		// final Paragraph paragraph = new Paragraph();
-		// paragraph.setStyle("Synopsis_20_Para");
-		// paragraph.addContent("Here is my paragraph");
-		// doc.add(paragraph);
 	}
 
+	@SuppressWarnings("unchecked")
 	public static List<Attribute> getStyleList(String attName,
 			Element automaticStyle) {
 
