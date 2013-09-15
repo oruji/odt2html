@@ -101,10 +101,16 @@ public class App {
 					outHTML.append("&nbsp;");
 
 			} else if (element.getName().equals("s")) {
-				int spaceNo = Integer.parseInt(element.getAttributeValue("c",
-						element.getNamespace()));
-				for (int i = 0; i <= spaceNo; i++)
+				String spaceNo = element.getAttributeValue("c",
+						element.getNamespace());
+
+				if (spaceNo == null) {
 					outHTML.append("&nbsp;");
+				} else {
+					for (int i = 0; i < (spaceNo == null ? 0 : Integer
+							.parseInt(spaceNo)); i++)
+						outHTML.append("&nbsp;");
+				}
 
 			} else {
 				for (Object obj2 : element.getContent()) {
