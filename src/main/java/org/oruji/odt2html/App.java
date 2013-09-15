@@ -9,8 +9,11 @@ import java.util.List;
 
 import org.jdom.Attribute;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jopendocument.dom.ODPackage;
+
+import com.sun.org.apache.xml.internal.utils.NameSpace;
 
 public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
@@ -96,7 +99,14 @@ public class App {
 		if (!obj.toString().startsWith("[Text: ")) {
 			Element element = ((Element) obj);
 
-			if (element.getName().equals("tab")) {
+			if (element.getName().equals("a")) {
+				String myUrl = element.getAttributeValue("href",
+						Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
+				outHTML.append("<a href='" + myUrl + "'>");
+				outHTML.append(element.getValue());
+				outHTML.append("</a>");
+
+			} else if (element.getName().equals("tab")) {
 				for (int i = 0; i < 8; i++)
 					outHTML.append("&nbsp;");
 
@@ -106,6 +116,7 @@ public class App {
 
 				if (spaceNo == null) {
 					outHTML.append("&nbsp;");
+
 				} else {
 					for (int i = 0; i < (spaceNo == null ? 0 : Integer
 							.parseInt(spaceNo)); i++)
