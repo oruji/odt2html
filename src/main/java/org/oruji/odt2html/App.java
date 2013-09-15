@@ -125,7 +125,8 @@ public class App {
 		else
 			tagName = currentContent.getName();
 
-		outHTML.append("<" + tagName + " " + createdStyle + ">"
+		outHTML.append("<" + tagName
+				+ (createdStyle.equals("") ? "" : " " + createdStyle) + ">"
 				+ ((Text) myObj).getValue() + "</" + tagName + ">");
 	}
 
@@ -149,9 +150,10 @@ public class App {
 
 	public static String createStyle(List<Attribute> attList) {
 		StringBuilder createdStyle = new StringBuilder("");
-		createdStyle.append("style='");
 
-		if (attList != null)
+		if (attList != null && attList.size() > 0) {
+			createdStyle.append("style='");
+
 			for (Attribute att : attList) {
 				if (att.getName().equals("font-name"))
 					createdStyle.append("font-family:" + att.getValue() + ";");
@@ -162,7 +164,11 @@ public class App {
 				}
 			}
 
-		createdStyle.append("'");
+			createdStyle.append("'");
+		}
+
+		if (createdStyle.toString().equals("style=''"))
+			createdStyle = new StringBuilder();
 
 		return createdStyle.toString();
 	}
