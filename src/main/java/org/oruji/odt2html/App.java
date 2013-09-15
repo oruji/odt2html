@@ -81,9 +81,8 @@ public class App {
 				endTag = "</li>";
 			}
 
-			for (int j = 0; j < myElement.getContent().size(); j++) {
-				recursiveElement(myElement.getContent().get(j));
-			}
+			for (Object myObj : myElement.getContent())
+				recursiveElement(myObj);
 
 			outHTML.append(endTag);
 		}
