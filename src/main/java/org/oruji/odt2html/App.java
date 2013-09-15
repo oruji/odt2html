@@ -110,11 +110,8 @@ public class App {
 
 		currentText = (Text) obj;
 		currentElement = (Element) currentText.getParent();
-
-		if (currentElement.getAttributes().size() > 0) {
-			currentAttr = currentElement.getAttributeValue("style-name",
-					currentElement.getNamespace());
-		}
+		currentAttr = currentElement.getAttributeValue("style-name",
+				currentElement.getNamespace());
 
 		createdStyle = createStyle(getStyleList(currentAttr, automaticStyle));
 
