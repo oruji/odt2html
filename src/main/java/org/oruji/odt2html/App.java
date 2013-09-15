@@ -15,7 +15,7 @@ import org.jopendocument.dom.text.Paragraph;
 
 public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
-	private static ODPackage p;
+	private static ODPackage openDocumentPackage;
 	private static Element automaticStyle;
 
 	public static void recursiveElement(Object myObj) {
@@ -50,15 +50,17 @@ public class App {
 	}
 
 	public static void main(String[] args) throws IOException {
-		p = new ODPackage(new File("test.odt"));
+		openDocumentPackage = new ODPackage(new File("test.odt"));
 
-		automaticStyle = (Element) p.getTextDocument().getContentDocument()
-				.getRootElement().getContent().get(2);
+		automaticStyle = (Element) openDocumentPackage.getTextDocument()
+				.getContentDocument().getRootElement().getContent().get(2);
 
 		// Paragraph Iteration
-		for (int i = 0; i < p.getTextDocument().getParagraphCount(); i++) {
+		for (int i = 0; i < openDocumentPackage.getTextDocument()
+				.getParagraphCount(); i++) {
 			outHTML.append("<p>");
-			Paragraph currentParagraph = p.getTextDocument().getParagraph(i);
+			Paragraph currentParagraph = openDocumentPackage.getTextDocument()
+					.getParagraph(i);
 			Element currentElement = currentParagraph.getElement();
 
 			// Contents of Paragraph Iteration
