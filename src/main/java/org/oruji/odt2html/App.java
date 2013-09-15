@@ -27,6 +27,7 @@ public class App {
 		if (!curStr.startsWith("[Text: ")) {
 			if (((Element) myObj).getContent().size() > 0)
 				recursiveElement(((Element) myObj).getContent().get(0));
+
 			return;
 
 		} else {
@@ -71,6 +72,7 @@ public class App {
 			outHTML.append("</p>");
 		}
 
+		htmlBuilder();
 		System.out.println(outHTML);
 		saveToFile("test.html", outHTML.toString());
 	}
@@ -125,5 +127,14 @@ public class App {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static void htmlBuilder() {
+		StringBuilder myOutHTML = new StringBuilder();
+		myOutHTML
+				.append("<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>\n\n");
+		myOutHTML.append(outHTML);
+		myOutHTML.append("\n\n</body></html>");
+		outHTML = new StringBuilder(myOutHTML);
 	}
 }
