@@ -4,5 +4,6 @@
 .project
 .classpath
 target
-*.odt_FILES
-*.odt
+test.odt_FILES
+test.odt
+test.html

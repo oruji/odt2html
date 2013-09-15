@@ -1,7 +1,10 @@
 package org.oruji.odt2html;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.List;
 
 import org.jdom.Attribute;
@@ -67,6 +70,7 @@ public class App {
 		}
 
 		System.out.println(outHTML);
+		saveToFile("test.html", outHTML.toString());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -95,7 +99,7 @@ public class App {
 			for (Attribute att : attList) {
 				if (att.getName().equals("font-name"))
 					createdStyle.append("font-family:" + att.getValue() + ";");
-					
+
 				if (att.getNamespacePrefix().equals("fo")) {
 					createdStyle.append(att.getName() + ":" + att.getValue()
 							+ ";");
@@ -105,5 +109,19 @@ public class App {
 		createdStyle.append("'");
 
 		return createdStyle.toString();
+	}
+
+	public static void saveToFile(String fileName, String text) {
+		Writer out = null;
+		File file = new File(fileName);
+
+		try {
+			out = new BufferedWriter(new FileWriter(file));
+			out.write(text);
+			out.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 }
