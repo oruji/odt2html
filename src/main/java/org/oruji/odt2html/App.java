@@ -115,6 +115,7 @@ public class App {
 		String currentAttr = null;
 		String createdStyle = null;
 		String tagName = null;
+		String tagBody = null;
 
 		currentText = (Text) obj;
 		currentElement = (Element) currentText.getParent();
@@ -129,12 +130,13 @@ public class App {
 		else
 			tagName = currentElement.getName();
 
-		outHTML.append("<"
-				+ tagName
-				+ (createdStyle.equals("") ? "" : " " + createdStyle)
-				+ ">"
-				+ currentText.getValue().replace("<", "&lt;")
-						.replace(">", "&gt;") + "</" + tagName + ">");
+		createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+
+		tagBody = currentText.getValue().replace("<", "&lt;")
+				.replace(">", "&gt;");
+
+		outHTML.append("<" + tagName + createdStyle + ">" + tagBody + "</"
+				+ tagName + ">");
 	}
 
 	@SuppressWarnings("unchecked")
