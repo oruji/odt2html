@@ -48,7 +48,7 @@ public class App {
 		createdStyle = createStyle(getStyleList(myAtt, automaticStyle));
 
 		if (currentContent.getName().equals("h"))
-			tagName = "h1";
+			tagName = "span";
 
 		else
 			tagName = currentContent.getName();
@@ -82,8 +82,25 @@ public class App {
 			}
 
 			else if (myElement.getName().equals("h")) {
-				outHTML.append("");
-				endTag = "";
+				switch (myElement.getValue()) {
+				case "Heading 1":
+					outHTML.append("<h1>");
+					endTag = "</h1>";
+					break;
+
+				case "Heading 2":
+					outHTML.append("<h2>");
+					endTag = "</h2>";
+					break;
+
+				case "Heading 3":
+					outHTML.append("<h3>");
+					endTag = "</h3>";
+					break;
+
+				default:
+					break;
+				}
 			}
 
 			else if (myElement.getName().equals("list")) {
