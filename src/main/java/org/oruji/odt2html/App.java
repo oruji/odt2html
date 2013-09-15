@@ -45,10 +45,35 @@ public class App {
 			}
 
 			else if (myElement.getName().equals("h")) {
-				myElement.getAttribute("style-name", myElement.getNamespace());
-				automaticStyle.getChild("style");
-				outHTML.append("<h1>");
-				endTag = "</h1>";
+				String myAttribute = myElement.getAttributeValue("style-name",
+						myElement.getNamespace());
+
+				for (Object con : automaticStyle.getContent()) {
+					if (((Element) con).getAttributeValue("name",
+							((Element) con).getNamespace()).equals(myAttribute)) {
+						switch (((Element) con).getAttributeValue(
+								"parent-style-name",
+								((Element) con).getNamespace())) {
+						case "Heading_20_1":
+							outHTML.append("<h1>");
+							endTag = "</h1>";
+							break;
+
+						case "Heading_20_2":
+							outHTML.append("<h2>");
+							endTag = "</h2>";
+							break;
+
+						case "Heading_20_3":
+							outHTML.append("<h3>");
+							endTag = "</h3>";
+							break;
+
+						default:
+							break;
+						}
+					}
+				}
 			}
 
 			else if (myElement.getName().equals("list")) {
@@ -103,7 +128,7 @@ public class App {
 		outHTML.append("<" + tagName + " " + createdStyle + ">"
 				+ ((Text) myObj).getValue() + "</" + tagName + ">");
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public static List<Attribute> getStyleList(String attName,
 			Element automaticStyle) {
