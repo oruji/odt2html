@@ -92,9 +92,9 @@ public class App {
 		saveToFile("test.html", outHTML.toString());
 	}
 
-	public static void recursiveElement(Object myObj) {
-		if (!myObj.toString().startsWith("[Text: ")) {
-			Element element = ((Element) myObj);
+	public static void recursiveElement(Object obj) {
+		if (!obj.toString().startsWith("[Text: ")) {
+			Element element = ((Element) obj);
 
 			if (element.getContent().size() > 0)
 				recursiveElement(element.getContent().get(0));
@@ -102,27 +102,27 @@ public class App {
 			return;
 		}
 
-		Element currentContent = null;
+		Element currentElement = null;
 		Text currentText = null;
+		String currentAttr = null;
 		String createdStyle = null;
 		String tagName = null;
-		currentText = (Text) myObj;
-		String myAtt = null;
 
-		currentContent = ((Element) currentText.getParent());
+		currentText = (Text) obj;
+		currentElement = (Element) currentText.getParent();
 
-		if (currentContent.getAttributes().size() > 0) {
-			myAtt = ((Attribute) currentContent.getAttributes().get(0))
-					.getValue();
+		if (currentElement.getAttributes().size() > 0) {
+			currentAttr = currentElement.getAttributeValue("style-name",
+					currentElement.getNamespace());
 		}
 
-		createdStyle = createStyle(getStyleList(myAtt, automaticStyle));
+		createdStyle = createStyle(getStyleList(currentAttr, automaticStyle));
 
-		if (currentContent.getName().equals("h"))
+		if (currentElement.getName().equals("h"))
 			tagName = "span";
 
 		else
-			tagName = currentContent.getName();
+			tagName = currentElement.getName();
 
 		outHTML.append("<" + tagName
 				+ (createdStyle.equals("") ? "" : " " + createdStyle) + ">"
