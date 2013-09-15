@@ -17,6 +17,10 @@ public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
 	private static ODPackage openDocumentPackage;
 	private static Element automaticStyle;
+	private static Element rootElement;
+	private static Element bodyElement;
+	private static Element textElement;
+	private static Element contentElement;
 
 	public static void recursiveElement(Object myObj) {
 		Element currentContent = null;
@@ -53,24 +57,54 @@ public class App {
 	public static void main(String[] args) throws IOException {
 		openDocumentPackage = new ODPackage(new File("test.odt"));
 
-		automaticStyle = (Element) openDocumentPackage.getTextDocument()
-				.getContentDocument().getRootElement().getContent().get(2);
+		rootElement = openDocumentPackage.getTextDocument()
+				.getContentDocument().getRootElement();
 
-		// Paragraph Iteration
-		for (int i = 0; i < openDocumentPackage.getTextDocument()
-				.getParagraphCount(); i++) {
-			outHTML.append("<p>");
-			Paragraph currentParagraph = openDocumentPackage.getTextDocument()
-					.getParagraph(i);
-			Element currentElement = currentParagraph.getElement();
+		automaticStyle = (Element) rootElement.getContent().get(2);
+		bodyElement = (Element) rootElement.getContent().get(3);
+		textElement = (Element) bodyElement.getContent().get(0);
 
-			// Contents of Paragraph Iteration
-			for (int j = 0; j < currentElement.getContent().size(); j++) {
-				recursiveElement(currentElement.getContent().get(j));
+		for (Object obj : textElement.getContent()) {
+			Element myElement = ((Element) obj);
+			String endTag = "";
+
+			if (myElement.getName().equals("p")) {
+				outHTML.append("<p>");
+				endTag = "</p>";
 			}
 
-			outHTML.append("</p>");
+			else if (myElement.getName().equals("h")) {
+				outHTML.append("<h1>");
+				endTag = "</h1>";
+			}
+
+			else if (myElement.getName().equals("list")) {
+				outHTML.append("<li>");
+				endTag = "</li>";
+			}
+
+			for (int j = 0; j < myElement.getContent().size(); j++) {
+				recursiveElement(myElement.getContent().get(j));
+			}
+
+			outHTML.append(endTag);
 		}
+
+		// Paragraph Iteration
+//		for (int i = 0; i < openDocumentPackage.getTextDocument()
+//				.getParagraphCount(); i++) {
+//			outHTML.append("<p>");
+//			Paragraph currentParagraph = openDocumentPackage.getTextDocument()
+//					.getParagraph(i);
+//			Element currentElement = currentParagraph.getElement();
+//
+//			// Contents of Paragraph Iteration
+//			for (int j = 0; j < currentElement.getContent().size(); j++) {
+//				recursiveElement(currentElement.getContent().get(j));
+//			}
+//
+//			outHTML.append("</p>");
+//		}
 
 		htmlBuilder();
 		System.out.println(outHTML);
