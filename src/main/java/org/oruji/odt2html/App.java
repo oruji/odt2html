@@ -96,8 +96,16 @@ public class App {
 		if (!obj.toString().startsWith("[Text: ")) {
 			Element element = ((Element) obj);
 
-			if (element.getContent().size() > 0)
-				recursiveElement(element.getContent().get(0));
+			if (element.getName().equals("tab"))
+				outHTML.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+
+			else if (element.getName().equals("s"))
+				outHTML.append("&nbsp;");
+
+			else
+				for (Object obj2 : element.getContent()) {
+					recursiveElement(obj2);
+				}
 
 			return;
 		}
@@ -135,6 +143,7 @@ public class App {
 				if (((Attribute) att).getName().equals("name")
 						&& ((Attribute) att).getValue().equals(attName)) {
 					((Attribute) att).getName();
+
 					return ((Element) ((Element) el).getContent().get(0))
 							.getAttributes();
 				}
@@ -169,6 +178,15 @@ public class App {
 		return createdStyle.toString();
 	}
 
+	public static void htmlBuilder() {
+		StringBuilder myOutHTML = new StringBuilder();
+		myOutHTML
+				.append("<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>\n\n");
+		myOutHTML.append(outHTML);
+		myOutHTML.append("\n\n</body></html>");
+		outHTML = new StringBuilder(myOutHTML);
+	}
+
 	public static void saveToFile(String fileName, String text) {
 		Writer out = null;
 		File file = new File(fileName);
@@ -181,14 +199,5 @@ public class App {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-
-	public static void htmlBuilder() {
-		StringBuilder myOutHTML = new StringBuilder();
-		myOutHTML
-				.append("<html><head><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' /></head><body>\n\n");
-		myOutHTML.append(outHTML);
-		myOutHTML.append("\n\n</body></html>");
-		outHTML = new StringBuilder(myOutHTML);
 	}
 }
