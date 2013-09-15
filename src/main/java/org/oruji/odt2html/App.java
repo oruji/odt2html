@@ -93,21 +93,20 @@ public class App {
 	}
 
 	public static void recursiveElement(Object myObj) {
+		if (!myObj.toString().startsWith("[Text: ")) {
+			Element element = ((Element) myObj);
+
+			if (element.getContent().size() > 0)
+				recursiveElement(element.getContent().get(0));
+
+			return;
+		}
+
 		Element currentContent = null;
 		Text currentText = null;
 		String createdStyle = null;
 		String tagName = null;
-
-		if (!myObj.toString().startsWith("[Text: ")) {
-			if (((Element) myObj).getContent().size() > 0)
-				recursiveElement(((Element) myObj).getContent().get(0));
-
-			return;
-
-		} else {
-			currentText = (Text) myObj;
-		}
-
+		currentText = (Text) myObj;
 		String myAtt = null;
 
 		currentContent = ((Element) currentText.getParent());
@@ -127,7 +126,7 @@ public class App {
 
 		outHTML.append("<" + tagName
 				+ (createdStyle.equals("") ? "" : " " + createdStyle) + ">"
-				+ ((Text) myObj).getValue() + "</" + tagName + ">");
+				+ currentText.getValue() + "</" + tagName + ">");
 	}
 
 	@SuppressWarnings("unchecked")
