@@ -40,9 +40,6 @@ public class App {
 			String endTag = "";
 
 			if (myElement.getName().equals("p")) {
-				// outHTML.append("<p>");
-				// endTag = "</p>";
-
 				outHTML.append("");
 				endTag = "<br />";
 			}
@@ -100,7 +97,7 @@ public class App {
 			Element element = ((Element) obj);
 
 			if (element.getName().equals("tab"))
-				outHTML.append("&nbsp;&nbsp;&nbsp;&nbsp;");
+				outHTML.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
 
 			else if (element.getName().equals("s"))
 				outHTML.append("&nbsp;");
