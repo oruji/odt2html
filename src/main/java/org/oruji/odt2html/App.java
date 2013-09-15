@@ -88,22 +88,6 @@ public class App {
 			outHTML.append(endTag);
 		}
 
-		// Paragraph Iteration
-		// for (int i = 0; i < openDocumentPackage.getTextDocument()
-		// .getParagraphCount(); i++) {
-		// outHTML.append("<p>");
-		// Paragraph currentParagraph = openDocumentPackage.getTextDocument()
-		// .getParagraph(i);
-		// Element currentElement = currentParagraph.getElement();
-		//
-		// // Contents of Paragraph Iteration
-		// for (int j = 0; j < currentElement.getContent().size(); j++) {
-		// recursiveElement(currentElement.getContent().get(j));
-		// }
-		//
-		// outHTML.append("</p>");
-		// }
-
 		htmlBuilder();
 		System.out.println(outHTML);
 		saveToFile("test.html", outHTML.toString());
