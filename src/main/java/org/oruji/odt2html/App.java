@@ -20,6 +20,53 @@ public class App {
 	private static Element bodyElement;
 	private static Element textElement;
 
+	public static void main(String[] args) throws IOException {
+		openDocumentPackage = new ODPackage(new File("test.odt"));
+
+		rootElement = openDocumentPackage.getTextDocument()
+				.getContentDocument().getRootElement();
+
+		automaticStyle = (Element) rootElement.getContent().get(2);
+		bodyElement = (Element) rootElement.getContent().get(3);
+		textElement = (Element) bodyElement.getContent().get(0);
+
+		// iterating <office:text>
+		for (Object obj : textElement.getContent()) {
+			Element myElement = ((Element) obj);
+
+			if (myElement.getName().equals("sequence-decls"))
+				continue;
+
+			String endTag = "";
+
+			if (myElement.getName().equals("p")) {
+				outHTML.append("<p>");
+				endTag = "</p>";
+			}
+
+			else if (myElement.getName().equals("h")) {
+				myElement.getAttribute("style-name", myElement.getNamespace());
+				automaticStyle.getChild("style");
+				outHTML.append("<h1>");
+				endTag = "</h1>";
+			}
+
+			else if (myElement.getName().equals("list")) {
+				outHTML.append("<li>");
+				endTag = "</li>";
+			}
+
+			for (Object myObj : myElement.getContent())
+				recursiveElement(myObj);
+
+			outHTML.append(endTag);
+		}
+
+		htmlBuilder();
+		System.out.println(outHTML);
+		saveToFile("test.html", outHTML.toString());
+	}
+
 	public static void recursiveElement(Object myObj) {
 		Element currentContent = null;
 		Text currentText = null;
@@ -56,69 +103,7 @@ public class App {
 		outHTML.append("<" + tagName + " " + createdStyle + ">"
 				+ ((Text) myObj).getValue() + "</" + tagName + ">");
 	}
-
-	public static void main(String[] args) throws IOException {
-		openDocumentPackage = new ODPackage(new File("test.odt"));
-
-		rootElement = openDocumentPackage.getTextDocument()
-				.getContentDocument().getRootElement();
-
-		automaticStyle = (Element) rootElement.getContent().get(2);
-		bodyElement = (Element) rootElement.getContent().get(3);
-		textElement = (Element) bodyElement.getContent().get(0);
-
-		// iterating <office:text>
-		for (Object obj : textElement.getContent()) {
-			Element myElement = ((Element) obj);
-
-			if (myElement.getName().equals("sequence-decls"))
-				continue;
-
-			String endTag = "";
-
-			if (myElement.getName().equals("p")) {
-				outHTML.append("<p>");
-				endTag = "</p>";
-			}
-
-			else if (myElement.getName().equals("h")) {
-				switch (myElement.getValue()) {
-				case "Heading 1":
-					outHTML.append("<h1>");
-					endTag = "</h1>";
-					break;
-
-				case "Heading 2":
-					outHTML.append("<h2>");
-					endTag = "</h2>";
-					break;
-
-				case "Heading 3":
-					outHTML.append("<h3>");
-					endTag = "</h3>";
-					break;
-
-				default:
-					break;
-				}
-			}
-
-			else if (myElement.getName().equals("list")) {
-				outHTML.append("<li>");
-				endTag = "</li>";
-			}
-
-			for (Object myObj : myElement.getContent())
-				recursiveElement(myObj);
-
-			outHTML.append(endTag);
-		}
-
-		htmlBuilder();
-		System.out.println(outHTML);
-		saveToFile("test.html", outHTML.toString());
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	public static List<Attribute> getStyleList(String attName,
 			Element automaticStyle) {
