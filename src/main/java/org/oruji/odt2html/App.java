@@ -40,8 +40,11 @@ public class App {
 			String endTag = "";
 
 			if (myElement.getName().equals("p")) {
-				outHTML.append("<p>");
-				endTag = "</p>";
+				// outHTML.append("<p>");
+				// endTag = "</p>";
+
+				outHTML.append("");
+				endTag = "<br />";
 			}
 
 			else if (myElement.getName().equals("h")) {
@@ -124,7 +127,8 @@ public class App {
 
 		createdStyle = createStyle(getStyleList(currentAttr, automaticStyle));
 
-		if (currentElement.getName().equals("h"))
+		if (currentElement.getName().equals("h")
+				|| currentElement.getName().equals("p"))
 			tagName = "span";
 
 		else
