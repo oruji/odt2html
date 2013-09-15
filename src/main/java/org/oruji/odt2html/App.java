@@ -11,7 +11,6 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Text;
 import org.jopendocument.dom.ODPackage;
-import org.jopendocument.dom.text.Paragraph;
 
 public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
@@ -20,7 +19,6 @@ public class App {
 	private static Element rootElement;
 	private static Element bodyElement;
 	private static Element textElement;
-	private static Element contentElement;
 
 	public static void recursiveElement(Object myObj) {
 		Element currentContent = null;
@@ -91,20 +89,20 @@ public class App {
 		}
 
 		// Paragraph Iteration
-//		for (int i = 0; i < openDocumentPackage.getTextDocument()
-//				.getParagraphCount(); i++) {
-//			outHTML.append("<p>");
-//			Paragraph currentParagraph = openDocumentPackage.getTextDocument()
-//					.getParagraph(i);
-//			Element currentElement = currentParagraph.getElement();
-//
-//			// Contents of Paragraph Iteration
-//			for (int j = 0; j < currentElement.getContent().size(); j++) {
-//				recursiveElement(currentElement.getContent().get(j));
-//			}
-//
-//			outHTML.append("</p>");
-//		}
+		// for (int i = 0; i < openDocumentPackage.getTextDocument()
+		// .getParagraphCount(); i++) {
+		// outHTML.append("<p>");
+		// Paragraph currentParagraph = openDocumentPackage.getTextDocument()
+		// .getParagraph(i);
+		// Element currentElement = currentParagraph.getElement();
+		//
+		// // Contents of Paragraph Iteration
+		// for (int j = 0; j < currentElement.getContent().size(); j++) {
+		// recursiveElement(currentElement.getContent().get(j));
+		// }
+		//
+		// outHTML.append("</p>");
+		// }
 
 		htmlBuilder();
 		System.out.println(outHTML);
