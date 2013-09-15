@@ -129,9 +129,12 @@ public class App {
 		else
 			tagName = currentElement.getName();
 
-		outHTML.append("<" + tagName
-				+ (createdStyle.equals("") ? "" : " " + createdStyle) + ">"
-				+ currentText.getValue() + "</" + tagName + ">");
+		outHTML.append("<"
+				+ tagName
+				+ (createdStyle.equals("") ? "" : " " + createdStyle)
+				+ ">"
+				+ currentText.getValue().replace("<", "&lt;")
+						.replace(">", "&gt;") + "</" + tagName + ">");
 	}
 
 	@SuppressWarnings("unchecked")
