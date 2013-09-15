@@ -96,16 +96,21 @@ public class App {
 		if (!obj.toString().startsWith("[Text: ")) {
 			Element element = ((Element) obj);
 
-			if (element.getName().equals("tab"))
-				outHTML.append("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;");
+			if (element.getName().equals("tab")) {
+				for (int i = 0; i < 8; i++)
+					outHTML.append("&nbsp;");
 
-			else if (element.getName().equals("s"))
-				outHTML.append("&nbsp;");
+			} else if (element.getName().equals("s")) {
+				int spaceNo = Integer.parseInt(element.getAttributeValue("c",
+						element.getNamespace()));
+				for (int i = 0; i <= spaceNo; i++)
+					outHTML.append("&nbsp;");
 
-			else
+			} else {
 				for (Object obj2 : element.getContent()) {
 					recursiveElement(obj2);
 				}
+			}
 
 			return;
 		}
