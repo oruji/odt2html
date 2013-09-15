@@ -24,9 +24,9 @@ public class App {
 		Element currentContent = null;
 		Text currentText = null;
 		String createdStyle = null;
-		String curStr = myObj.toString();
+		String tagName = null;
 
-		if (!curStr.startsWith("[Text: ")) {
+		if (!myObj.toString().startsWith("[Text: ")) {
 			if (((Element) myObj).getContent().size() > 0)
 				recursiveElement(((Element) myObj).getContent().get(0));
 
@@ -47,9 +47,14 @@ public class App {
 
 		createdStyle = createStyle(getStyleList(myAtt, automaticStyle));
 
-		outHTML.append("<" + currentContent.getName() + " " + createdStyle
-				+ ">" + ((Text) myObj).getValue() + "</"
-				+ currentContent.getName() + ">");
+		if (currentContent.getName().equals("h"))
+			tagName = "h1";
+
+		else
+			tagName = currentContent.getName();
+
+		outHTML.append("<" + tagName + " " + createdStyle + ">"
+				+ ((Text) myObj).getValue() + "</" + tagName + ">");
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -62,8 +67,13 @@ public class App {
 		bodyElement = (Element) rootElement.getContent().get(3);
 		textElement = (Element) bodyElement.getContent().get(0);
 
+		// iterating <office:text>
 		for (Object obj : textElement.getContent()) {
 			Element myElement = ((Element) obj);
+
+			if (myElement.getName().equals("sequence-decls"))
+				continue;
+
 			String endTag = "";
 
 			if (myElement.getName().equals("p")) {
@@ -72,8 +82,8 @@ public class App {
 			}
 
 			else if (myElement.getName().equals("h")) {
-				outHTML.append("<h1>");
-				endTag = "</h1>";
+				outHTML.append("");
+				endTag = "";
 			}
 
 			else if (myElement.getName().equals("list")) {
