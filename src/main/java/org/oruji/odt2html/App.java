@@ -42,117 +42,102 @@ public class App {
 	}
 
 	public static void recursiveElement(Object obj) {
-		if (!obj.toString().startsWith("[Text: ")) {
-			Element element = ((Element) obj);
-			String endTag = "";
-
-			if (element.getName().equals("sequence-decls")) {
-				endTag = "";
-
-			} else if (element.getName().equals("h")) {
-				String myAttribute = element.getAttributeValue("style-name",
-						element.getNamespace());
-
-				for (Object con : automaticStyle.getContent()) {
-					if (myAttribute.equals(((Element) con).getAttributeValue(
-							"name", ((Element) con).getNamespace()))) {
-						switch (((Element) con).getAttributeValue(
-								"parent-style-name",
-								((Element) con).getNamespace())) {
-						case "Heading_20_1":
-							outHTML.append("<h1>");
-							endTag = "</h1>";
-							break;
-
-						case "Heading_20_2":
-							outHTML.append("<h2>");
-							endTag = "</h2>";
-							break;
-
-						case "Heading_20_3":
-							outHTML.append("<h3>");
-							endTag = "</h3>";
-							break;
-
-						default:
-							break;
-						}
-					}
-				}
-
-			} else if (element.getName().equals("p")) {
-				outHTML.append("<div>");
-				endTag = "</div>";
-
-			} else if (element.getName().equals("a")) {
-				String myUrl = element.getAttributeValue("href", Namespace
-						.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
-				outHTML.append("<a href='" + myUrl + "'>");
-				endTag = "</a>";
-
-			} else if (element.getName().equals("tab")) {
-				for (int i = 0; i < 8; i++)
-					outHTML.append("&nbsp;");
-
-			} else if (element.getName().equals("s")) {
-				String spaceNo = element.getAttributeValue("c",
-						element.getNamespace());
-
-				if (spaceNo == null) {
-					outHTML.append("&nbsp;");
-
-				} else {
-					for (int i = 0; i < (spaceNo == null ? 0 : Integer
-							.parseInt(spaceNo)); i++)
-						outHTML.append("&nbsp;");
-				}
-
-			} else if (element.getName().equals("list-item")) {
-				outHTML.append("<li>");
-				endTag = "</li>";
-
-			} else if (element.getName().equals("list")) {
-				outHTML.append("<ul>");
-				endTag = "</ul>";
-			}
-
-			for (Object obj2 : element.getContent()) {
-				recursiveElement(obj2);
-			}
-
-			outHTML.append(endTag);
-
+		// Loop Condition
+		if (obj.toString().startsWith("[Text: ")) {
+			Text text = (Text) obj;
+			String tagBody = text.getValue().replace("<", "&lt;")
+					.replace(">", "&gt;");
+			outHTML.append(tagBody);
 			return;
 		}
 
-		Element currentElement = null;
-		Text currentText = null;
-		String currentAttr = null;
-		String createdStyle = null;
-		String tagName = null;
-		String tagBody = null;
+		Element element = ((Element) obj);
+		String endTag = "";
 
-		currentText = (Text) obj;
-		currentElement = (Element) currentText.getParent();
-		currentAttr = currentElement.getAttributeValue("style-name",
-				currentElement.getNamespace());
+		if (element.getName().equals("sequence-decls")) {
+			endTag = "";
 
-		createdStyle = createStyle(getStyleList(currentAttr, automaticStyle));
+		} else if (element.getName().equals("span")) {
+			String currentAttr = element.getAttributeValue("style-name",
+					element.getNamespace());
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
+			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+			outHTML.append("<span" + createdStyle + ">");
+			endTag = "</span>";
 
-		if (currentElement.getName().equals("h")
-				|| currentElement.getName().equals("p"))
-			tagName = "span";
+		} else if (element.getName().equals("h")) {
+			String myAttribute = element.getAttributeValue("style-name",
+					element.getNamespace());
 
-		else
-			tagName = currentElement.getName();
+			for (Object con : automaticStyle.getContent()) {
+				if (myAttribute.equals(((Element) con).getAttributeValue(
+						"name", ((Element) con).getNamespace()))) {
+					switch (((Element) con)
+							.getAttributeValue("parent-style-name",
+									((Element) con).getNamespace())) {
+					case "Heading_20_1":
+						outHTML.append("<h1>");
+						endTag = "</h1>";
+						break;
 
-		createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+					case "Heading_20_2":
+						outHTML.append("<h2>");
+						endTag = "</h2>";
+						break;
 
-		tagBody = currentText.getValue().replace("<", "&lt;")
-				.replace(">", "&gt;");
+					case "Heading_20_3":
+						outHTML.append("<h3>");
+						endTag = "</h3>";
+						break;
 
-		outHTML.append("<" + tagName + createdStyle + ">" + tagBody + "</"
-				+ tagName + ">");
+					default:
+						break;
+					}
+				}
+			}
+
+		} else if (element.getName().equals("p")) {
+			outHTML.append("<div>");
+			endTag = "</div>";
+
+		} else if (element.getName().equals("a")) {
+			String myUrl = element.getAttributeValue("href", Namespace
+					.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
+			outHTML.append("<a href='" + myUrl + "'>");
+			endTag = "</a>";
+
+		} else if (element.getName().equals("tab")) {
+			for (int i = 0; i < 8; i++)
+				outHTML.append("&nbsp;");
+
+		} else if (element.getName().equals("s")) {
+			String spaceNo = element.getAttributeValue("c",
+					element.getNamespace());
+
+			if (spaceNo == null) {
+				outHTML.append("&nbsp;");
+
+			} else {
+				for (int i = 0; i < (spaceNo == null ? 0 : Integer
+						.parseInt(spaceNo)); i++)
+					outHTML.append("&nbsp;");
+			}
+
+		} else if (element.getName().equals("list-item")) {
+			outHTML.append("<li>");
+			endTag = "</li>";
+
+		} else if (element.getName().equals("list")) {
+			outHTML.append("<ul>");
+			endTag = "</ul>";
+		}
+
+		for (Object obj2 : element.getContent()) {
+			recursiveElement(obj2);
+		}
+
+		outHTML.append(endTag);
 	}
 
 	@SuppressWarnings("unchecked")
