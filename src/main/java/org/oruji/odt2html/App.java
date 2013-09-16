@@ -45,16 +45,18 @@ public class App {
 		// Loop Condition
 		if (obj.toString().startsWith("[Text: ")) {
 			Text text = (Text) obj;
-			String tagBody = text.getValue().replace("<", "&lt;")
+			String bodyTag = text.getValue().replace("<", "&lt;")
 					.replace(">", "&gt;");
-			outHTML.append(tagBody);
+			outHTML.append(bodyTag);
 			return;
 		}
 
 		Element element = ((Element) obj);
+		String startTag = "";
 		String endTag = "";
 
 		if (element.getName().equals("sequence-decls")) {
+			startTag = "";
 			endTag = "";
 
 		} else if (element.getName().equals("span")) {
@@ -63,10 +65,12 @@ public class App {
 			String createdStyle = createStyle(getStyleList(currentAttr,
 					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			outHTML.append("<span" + createdStyle + ">");
+
+			startTag = "<span" + createdStyle + ">";
 			endTag = "</span>";
 
 		} else if (element.getName().equals("h")) {
+			String tagName = "";
 			String myAttribute = element.getAttributeValue("style-name",
 					element.getNamespace());
 
@@ -77,18 +81,15 @@ public class App {
 							.getAttributeValue("parent-style-name",
 									((Element) con).getNamespace())) {
 					case "Heading_20_1":
-						outHTML.append("<h1>");
-						endTag = "</h1>";
+						tagName = "h1";
 						break;
 
 					case "Heading_20_2":
-						outHTML.append("<h2>");
-						endTag = "</h2>";
+						tagName = "h2";
 						break;
 
 					case "Heading_20_3":
-						outHTML.append("<h3>");
-						endTag = "</h3>";
+						tagName = "h3";
 						break;
 
 					default:
@@ -97,6 +98,14 @@ public class App {
 				}
 			}
 
+			String currentAttr = element.getAttributeValue("style-name",
+					element.getNamespace());
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
+			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+			startTag = "<" + tagName + createdStyle + ">";
+			endTag = "</" + tagName + ">";
+
 		} else if (element.getName().equals("p")) {
 
 			String currentAttr = element.getAttributeValue("style-name",
@@ -104,16 +113,13 @@ public class App {
 			String createdStyle = createStyle(getStyleList(currentAttr,
 					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			outHTML.append("<div" + createdStyle + ">");
+			startTag = "<div" + createdStyle + ">";
 			endTag = "</div>";
-
-			// outHTML.append("<div>");
-			// endTag = "</div>";
 
 		} else if (element.getName().equals("a")) {
 			String myUrl = element.getAttributeValue("href", Namespace
 					.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
-			outHTML.append("<a href='" + myUrl + "'>");
+			startTag = "<a href='" + myUrl + "'>";
 			endTag = "</a>";
 
 		} else if (element.getName().equals("tab")) {
@@ -134,18 +140,23 @@ public class App {
 			}
 
 		} else if (element.getName().equals("list-item")) {
-			outHTML.append("<li>");
+			startTag = "<li>";
 			endTag = "</li>";
 
 		} else if (element.getName().equals("list")) {
-			outHTML.append("<ul>");
+			startTag = "<ul>";
 			endTag = "</ul>";
 		}
 
+		// start tag
+		outHTML.append(startTag);
+
+		// body tag
 		for (Object obj2 : element.getContent()) {
 			recursiveElement(obj2);
 		}
 
+		// end tag
 		outHTML.append(endTag);
 	}
 
@@ -182,11 +193,11 @@ public class App {
 					// if (att.getValue().equals("rl-tb"))
 					switch (att.getValue()) {
 					case "rl-tb":
-						createdStyle.append("direction: rtl;");
+						createdStyle.append("direction:rtl;");
 						break;
 
 					case "lr-tb":
-						createdStyle.append("direction: ltr;");
+						createdStyle.append("direction:ltr;");
 						break;
 
 					default:
@@ -196,11 +207,11 @@ public class App {
 				} else if (att.getName().equals("text-align")) {
 					switch (att.getValue()) {
 					case "start":
-						createdStyle.append("text-align: left;");
+						createdStyle.append("text-align:left;");
 						break;
 
 					case "end":
-						createdStyle.append("text-align: right;");
+						createdStyle.append("text-align:right;");
 						break;
 
 					default:
