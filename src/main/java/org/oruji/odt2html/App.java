@@ -13,8 +13,6 @@ import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jopendocument.dom.ODPackage;
 
-import com.sun.org.apache.xml.internal.utils.NameSpace;
-
 public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
 	private static ODPackage openDocumentPackage;
@@ -52,8 +50,8 @@ public class App {
 						myElement.getNamespace());
 
 				for (Object con : automaticStyle.getContent()) {
-					if (((Element) con).getAttributeValue("name",
-							((Element) con).getNamespace()).equals(myAttribute)) {
+					if (myAttribute.equals(((Element) con).getAttributeValue(
+							"name", ((Element) con).getNamespace()))) {
 						switch (((Element) con).getAttributeValue(
 								"parent-style-name",
 								((Element) con).getNamespace())) {
@@ -80,8 +78,8 @@ public class App {
 			}
 
 			else if (myElement.getName().equals("list")) {
-				outHTML.append("<li>");
-				endTag = "</li>";
+				outHTML.append("<ul>");
+				endTag = "</ul>";
 			}
 
 			for (Object myObj : myElement.getContent())
@@ -90,6 +88,7 @@ public class App {
 			outHTML.append(endTag);
 		}
 
+		// Output HTML
 		htmlBuilder();
 		System.out.println(outHTML);
 		saveToFile("test.html", outHTML.toString());
@@ -100,8 +99,8 @@ public class App {
 			Element element = ((Element) obj);
 
 			if (element.getName().equals("a")) {
-				String myUrl = element.getAttributeValue("href",
-						Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
+				String myUrl = element.getAttributeValue("href", Namespace
+						.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
 				outHTML.append("<a href='" + myUrl + "'>");
 				outHTML.append(element.getValue());
 				outHTML.append("</a>");
@@ -123,7 +122,17 @@ public class App {
 						outHTML.append("&nbsp;");
 				}
 
+			} else if (element.getName().equals("list-item")) {
+				outHTML.append("<li>");
+
+				for (Object inObj : element.getContent()) {
+					recursiveElement(inObj);
+				}
+
+				outHTML.append("</li>");
+
 			} else {
+
 				for (Object obj2 : element.getContent()) {
 					recursiveElement(obj2);
 				}
