@@ -175,12 +175,44 @@ public class App {
 			createdStyle.append("style='");
 
 			for (Attribute att : attList) {
-				if (att.getName().equals("font-name"))
+				if (att.getName().equals("font-name")) {
 					createdStyle.append("font-family:" + att.getValue() + ";");
 
+				} else if (att.getName().equals("writing-mode")) {
+					// if (att.getValue().equals("rl-tb"))
+					switch (att.getValue()) {
+					case "rl-tb":
+						createdStyle.append("direction: rtl;");
+						break;
+
+					case "lr-tb":
+						createdStyle.append("direction: ltr;");
+						break;
+
+					default:
+						break;
+					}
+
+				} else if (att.getName().equals("text-align")) {
+					switch (att.getValue()) {
+					case "start":
+						createdStyle.append("text-align: left;");
+						break;
+
+					case "end":
+						createdStyle.append("text-align: right;");
+						break;
+
+					default:
+						break;
+					}
+				}
+
 				if (att.getNamespacePrefix().equals("fo")) {
-					createdStyle.append(att.getName() + ":" + att.getValue()
-							+ ";");
+					if (!att.getName().equals("text-align")) {
+						createdStyle.append(att.getName() + ":"
+								+ att.getValue() + ";");
+					}
 				}
 			}
 
