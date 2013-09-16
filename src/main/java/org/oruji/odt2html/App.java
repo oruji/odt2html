@@ -98,8 +98,17 @@ public class App {
 			}
 
 		} else if (element.getName().equals("p")) {
-			outHTML.append("<div>");
+
+			String currentAttr = element.getAttributeValue("style-name",
+					element.getNamespace());
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
+			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+			outHTML.append("<div" + createdStyle + ">");
 			endTag = "</div>";
+
+			// outHTML.append("<div>");
+			// endTag = "</div>";
 
 		} else if (element.getName().equals("a")) {
 			String myUrl = element.getAttributeValue("href", Namespace
