@@ -32,22 +32,26 @@ public class App {
 		textElement = (Element) bodyElement.getContent().get(0);
 
 		// iterating <office:text>
-		for (Object obj : textElement.getContent()) {
-			Element myElement = ((Element) obj);
+		for (Object myObj : textElement.getContent())
+			recursiveElement(myObj);
 
-			if (myElement.getName().equals("sequence-decls"))
-				continue;
+		// Output HTML
+		htmlBuilder();
+		System.out.println(outHTML);
+		saveToFile("test.html", outHTML.toString());
+	}
 
+	public static void recursiveElement(Object obj) {
+		if (!obj.toString().startsWith("[Text: ")) {
+			Element element = ((Element) obj);
 			String endTag = "";
 
-			if (myElement.getName().equals("p")) {
-				outHTML.append("");
-				endTag = "<br />";
-			}
+			if (element.getName().equals("sequence-decls")) {
+				endTag = "";
 
-			else if (myElement.getName().equals("h")) {
-				String myAttribute = myElement.getAttributeValue("style-name",
-						myElement.getNamespace());
+			} else if (element.getName().equals("h")) {
+				String myAttribute = element.getAttributeValue("style-name",
+						element.getNamespace());
 
 				for (Object con : automaticStyle.getContent()) {
 					if (myAttribute.equals(((Element) con).getAttributeValue(
@@ -75,35 +79,16 @@ public class App {
 						}
 					}
 				}
-			}
 
-			else if (myElement.getName().equals("list")) {
-				outHTML.append("<ul>");
-				endTag = "</ul>";
-			}
+			} else if (element.getName().equals("p")) {
+				outHTML.append("<div>");
+				endTag = "</div>";
 
-			for (Object myObj : myElement.getContent())
-				recursiveElement(myObj);
-
-			outHTML.append(endTag);
-		}
-
-		// Output HTML
-		htmlBuilder();
-		System.out.println(outHTML);
-		saveToFile("test.html", outHTML.toString());
-	}
-
-	public static void recursiveElement(Object obj) {
-		if (!obj.toString().startsWith("[Text: ")) {
-			Element element = ((Element) obj);
-
-			if (element.getName().equals("a")) {
+			} else if (element.getName().equals("a")) {
 				String myUrl = element.getAttributeValue("href", Namespace
 						.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
 				outHTML.append("<a href='" + myUrl + "'>");
-				outHTML.append(element.getValue());
-				outHTML.append("</a>");
+				endTag = "</a>";
 
 			} else if (element.getName().equals("tab")) {
 				for (int i = 0; i < 8; i++)
@@ -124,19 +109,18 @@ public class App {
 
 			} else if (element.getName().equals("list-item")) {
 				outHTML.append("<li>");
+				endTag = "</li>";
 
-				for (Object inObj : element.getContent()) {
-					recursiveElement(inObj);
-				}
-
-				outHTML.append("</li>");
-
-			} else {
-
-				for (Object obj2 : element.getContent()) {
-					recursiveElement(obj2);
-				}
+			} else if (element.getName().equals("list")) {
+				outHTML.append("<ul>");
+				endTag = "</ul>";
 			}
+
+			for (Object obj2 : element.getContent()) {
+				recursiveElement(obj2);
+			}
+
+			outHTML.append(endTag);
 
 			return;
 		}
@@ -175,15 +159,15 @@ public class App {
 	public static List<Attribute> getStyleList(String attName,
 			Element automaticStyle) {
 
-		for (Object el : automaticStyle.getContent()) {
-			for (Object att : ((Element) el).getAttributes()) {
-				if (((Attribute) att).getName().equals("name")
-						&& ((Attribute) att).getValue().equals(attName)) {
-					((Attribute) att).getName();
+		for (Object obj : automaticStyle.getContent()) {
+			Element element = (Element) obj;
 
-					return ((Element) ((Element) el).getContent().get(0))
+			if (attName != null
+					&& attName.equals(element.getAttributeValue("name",
+							element.getNamespace()))) {
+				if (element.getContent().size() > 0)
+					return ((Element) element.getContent().get(0))
 							.getAttributes();
-				}
 			}
 		}
 
