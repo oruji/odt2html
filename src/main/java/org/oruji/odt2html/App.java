@@ -107,7 +107,6 @@ public class App {
 			endTag = "</" + tagName + ">";
 
 		} else if (element.getName().equals("p")) {
-
 			String currentAttr = element.getAttributeValue("style-name",
 					element.getNamespace());
 			String createdStyle = createStyle(getStyleList(currentAttr,
@@ -145,6 +144,17 @@ public class App {
 
 		} else if (element.getName().equals("list")) {
 			startTag = "<ul>";
+
+			Element myEl6 = (Element)element.getContent().get(0);
+			Element pElement = (Element) myEl6.getContent().get(0);
+			
+			String currentAttr = pElement.getAttributeValue("style-name",
+					pElement.getNamespace());
+			String createdStyle = createULStyle(getStyleList(currentAttr,
+					automaticStyle));
+			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+			startTag = "<ul" + createdStyle + ">";
+			
 			endTag = "</ul>";
 		}
 
@@ -178,7 +188,7 @@ public class App {
 
 		return null;
 	}
-
+	
 	public static String createStyle(List<Attribute> attList) {
 		StringBuilder createdStyle = new StringBuilder("");
 
@@ -190,7 +200,6 @@ public class App {
 					createdStyle.append("font-family:" + att.getValue() + ";");
 
 				} else if (att.getName().equals("writing-mode")) {
-					// if (att.getValue().equals("rl-tb"))
 					switch (att.getValue()) {
 					case "rl-tb":
 						createdStyle.append("direction:rtl;");
@@ -236,6 +245,52 @@ public class App {
 		return createdStyle.toString();
 	}
 
+	public static String createULStyle(List<Attribute> attList) {
+		StringBuilder createdStyle = new StringBuilder("");
+
+		if (attList != null && attList.size() > 0) {
+			createdStyle.append("style='");
+
+			for (Attribute att : attList) {
+				if (att.getName().equals("writing-mode")) {
+					switch (att.getValue()) {
+					case "rl-tb":
+						createdStyle.append("direction:rtl;");
+						break;
+
+					case "lr-tb":
+						createdStyle.append("direction:ltr;");
+						break;
+
+					default:
+						break;
+					}
+
+				} else if (att.getName().equals("text-align")) {
+					switch (att.getValue()) {
+					case "start":
+						createdStyle.append("text-align:left;");
+						break;
+
+					case "end":
+						createdStyle.append("text-align:right;");
+						break;
+
+					default:
+						break;
+					}
+				}
+			}
+
+			createdStyle.append("'");
+		}
+
+		if (createdStyle.toString().equals("style=''"))
+			createdStyle = new StringBuilder();
+
+		return createdStyle.toString();
+	}
+	
 	public static void htmlBuilder() {
 		StringBuilder myOutHTML = new StringBuilder();
 		myOutHTML
@@ -257,5 +312,27 @@ public class App {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static Element getChildByName(Element element, String name) {
+		for (Object obj : element.getContent()) {
+			Element myEl = ((Element) obj);
+			if (name.equals(myEl.getName())) {
+				return myEl;
+			}
+		}
+		return null;
+	}
+
+	public static Element getChildByAttrNameValue(Element element, String name,
+			String value) {
+		for (Object obj : element.getContent()) {
+			Element myEl = ((Element) obj);
+
+			if (myEl.getAttributeValue(name, myEl.getNamespace()).equals(value)) {
+				return myEl;
+			}
+		}
+		return null;
 	}
 }
