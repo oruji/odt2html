@@ -54,9 +54,9 @@ public class App {
 		String endTag = "";
 
 		if (element.getName().equals("span")) {
-			Attribute currentAttr = getAttr(element, "style-name");
-			String createdStyle = createStyle(getStyleList(
-					currentAttr.getValue(), automaticStyle));
+			String currentAttr = getAttVal(element, "style-name");
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 
 			startTag = "<span" + createdStyle + ">";
@@ -64,13 +64,13 @@ public class App {
 
 		} else if (element.getName().equals("h")) {
 			String tagName = "";
-			Attribute currentAttr = getAttr(element, "style-name");
+			String currentAttr = getAttVal(element, "style-name");
 
 			for (Object con : automaticStyle.getContent()) {
 				Element loopEl = (Element) con;
 
-				if (currentAttr.equals(getAttr(loopEl, "name").getValue())) {
-					switch (getAttr(loopEl, "parent-style-name").getValue()) {
+				if (currentAttr.equals(getAttVal(loopEl, "name"))) {
+					switch (getAttVal(loopEl, "parent-style-name")) {
 					case "Heading_20_1":
 						tagName = "h1";
 						break;
@@ -89,8 +89,8 @@ public class App {
 				}
 			}
 
-			String createdStyle = createStyle(getStyleList(
-					currentAttr.getValue(), automaticStyle));
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
 
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<" + tagName + createdStyle + ">";
@@ -98,9 +98,9 @@ public class App {
 
 		} else if (element.getName().equals("p")) {
 
-			Attribute currentAttr = getAttr(element, "style-name");
-			String createdStyle = createStyle(getStyleList(
-					currentAttr.getValue(), automaticStyle));
+			String currentAttr = getAttVal(element, "style-name");
+			String createdStyle = createStyle(getStyleList(currentAttr,
+					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<div" + createdStyle + ">";
 			endTag = "</div>";
@@ -117,14 +117,14 @@ public class App {
 
 		} else if (element.getName().equals("s")) {
 
-			Attribute spaceNo = getAttr(element, "c");
+			String spaceNo = getAttVal(element, "c");
 
 			if (spaceNo == null) {
 				outHTML.append("&nbsp;");
 
 			} else {
 				for (int i = 0; i < (spaceNo == null ? 0 : Integer
-						.parseInt(spaceNo.getValue())); i++)
+						.parseInt(spaceNo)); i++)
 					outHTML.append("&nbsp;");
 			}
 
@@ -138,9 +138,9 @@ public class App {
 			Element myEl6 = (Element) element.getContent().get(0);
 			Element pElement = (Element) myEl6.getContent().get(0);
 
-			Attribute currentAttr = getAttr(pElement, "style-name");
-			String createdStyle = createULStyle(getStyleList(
-					currentAttr.getValue(), automaticStyle));
+			String currentAttr = getAttVal(pElement, "style-name");
+			String createdStyle = createULStyle(getStyleList(currentAttr,
+					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<ul" + createdStyle + ">";
 
@@ -166,8 +166,7 @@ public class App {
 		for (Object obj : automaticStyle.getContent()) {
 			Element element = (Element) obj;
 
-			if (attName != null
-					&& attName.equals(getAttr(element, "name").getValue())) {
+			if (attName != null && attName.equals(getAttVal(element, "name"))) {
 				if (element.getContent().size() > 0)
 					return ((Element) element.getContent().get(0))
 							.getAttributes();
@@ -324,7 +323,12 @@ public class App {
 		return null;
 	}
 
-	public static Attribute getAttr(Element element, String attrName) {
+	public static Attribute getAtt(Element element, String attrName) {
 		return element.getAttribute(attrName, element.getNamespace());
 	}
+
+	public static String getAttVal(Element element, String attrName) {
+		return getAtt(element, attrName).getValue();
+	}
+
 }
