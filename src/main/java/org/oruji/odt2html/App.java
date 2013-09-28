@@ -22,6 +22,31 @@ public class App {
 	private static Element bodyElement;
 	private static Element textElement;
 
+	public static String getAttStr(Element element) {
+
+		if (element.getName().equals("list")) {
+			Element myEl6 = null;
+			myEl6 = (Element) element.getContent().get(0);
+			element = (Element) myEl6.getContent().get(0);
+		}
+
+		if (element.getName().equals("span") || element.getName().equals("h")
+				|| element.getName().equals("p")) {
+			String currentAtt = getAttVal(element, "style-name");
+			String createdStyle = createStyle(
+					getStyleList(currentAtt, automaticStyle), element.getName());
+
+			return createdStyle.equals("") ? "" : " " + createdStyle;
+
+		} else if (element.getName().equals("a")) {
+			String myUrl = element.getAttributeValue("href", Namespace
+					.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
+			return " href='" + myUrl + "';";
+		}
+
+		return "";
+	}
+
 	public static String getTagName(Element element) {
 		if (element.getName().equals("span")) {
 			return element.getName();
@@ -34,6 +59,9 @@ public class App {
 
 		} else if (element.getName().equals("list-item")) {
 			return "li";
+
+		} else if (element.getName().equals("a")) {
+			return element.getName();
 
 		} else if (element.getName().equals("h")) {
 			String tagName = "";
@@ -77,7 +105,7 @@ public class App {
 			return tagName;
 
 		}
-		return null;
+		return "";
 	}
 
 	public static void recursiveElement(Object obj) {
@@ -89,46 +117,8 @@ public class App {
 		}
 
 		Element element = ((Element) obj);
-		String tagName = "";
-		String startTag = "";
-		String endTag = "";
 
-		tagName = getTagName(element);
-
-		if (element.getName().equals("span")) {
-			String currentAtt = getAttVal(element, "style-name");
-			String createdStyle = createStyle(
-					getStyleList(currentAtt, automaticStyle), element.getName());
-			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-
-			startTag = "<" + tagName + createdStyle + ">";
-			endTag = "</" + tagName + ">";
-
-		} else if (element.getName().equals("h")) {
-			String currentAtt = getAttVal(element, "style-name");
-			String createdStyle = createStyle(
-					getStyleList(currentAtt, automaticStyle), element.getName());
-
-			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			startTag = "<" + tagName + createdStyle + ">";
-			endTag = "</" + tagName + ">";
-
-		} else if (element.getName().equals("p")) {
-			String currentAtt = getAttVal(element, "style-name");
-			String createdStyle = createStyle(
-					getStyleList(currentAtt, automaticStyle), element.getName());
-
-			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			startTag = "<" + tagName + createdStyle + ">";
-			endTag = "</" + tagName + ">";
-
-		} else if (element.getName().equals("a")) {
-			String myUrl = element.getAttributeValue("href", Namespace
-					.getNamespace("xlink", "http://www.w3.org/1999/xlink"));
-			startTag = "<a href='" + myUrl + "'>";
-			endTag = "</a>";
-
-		} else if (element.getName().equals("tab")) {
+		if (element.getName().equals("tab")) {
 			for (int i = 0; i < 8; i++)
 				outHTML.append("&nbsp;");
 
@@ -144,21 +134,18 @@ public class App {
 					outHTML.append("&nbsp;");
 			}
 
-		} else if (element.getName().equals("list-item")) {
-			startTag = "<" + tagName + ">";
-			endTag = "</" + tagName + ">";
+		}
 
-		} else if (element.getName().equals("list")) {
-			Element myEl6 = (Element) element.getContent().get(0);
-			Element pElement = (Element) myEl6.getContent().get(0);
+		String tagName = "";
+		String startTag = "";
+		String attributeStr = "";
+		String endTag = "";
 
-			String currentAtt = getAttVal(pElement, "style-name");
+		tagName = getTagName(element);
+		attributeStr = getAttStr(element);
 
-			String createdStyle = createStyle(
-					getStyleList(currentAtt, automaticStyle), element.getName());
-			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-
-			startTag = "<" + tagName + createdStyle + ">";
+		if (tagName != null && !tagName.equals("")) {
+			startTag = "<" + tagName + attributeStr + ">";
 			endTag = "</" + tagName + ">";
 		}
 
