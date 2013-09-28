@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jdom.Attribute;
@@ -21,26 +22,6 @@ public class App {
 	private static Element bodyElement;
 	private static Element textElement;
 
-	public static void main(String[] args) throws IOException {
-		openDocumentPackage = new ODPackage(new File("test.odt"));
-
-		rootElement = openDocumentPackage.getTextDocument()
-				.getContentDocument().getRootElement();
-
-		automaticStyle = (Element) rootElement.getContent().get(2);
-		bodyElement = (Element) rootElement.getContent().get(3);
-		textElement = (Element) bodyElement.getContent().get(0);
-
-		// iterating <office:text>
-		for (Object myObj : textElement.getContent())
-			recursiveElement(myObj);
-
-		// Output HTML
-		htmlBuilder();
-		System.out.println(outHTML);
-		saveToFile("test.html", outHTML.toString());
-	}
-
 	public static void recursiveElement(Object obj) {
 		// Loop Condition
 		if (obj.toString().startsWith("[Text: ")) {
@@ -54,8 +35,8 @@ public class App {
 		String endTag = "";
 
 		if (element.getName().equals("span")) {
-			String currentAttr = getAttVal(element, "style-name");
-			String createdStyle = createStyle(getStyleList(currentAttr,
+			String currentAtt = getAttVal(element, "style-name");
+			String createdStyle = createStyle(getStyleList(currentAtt,
 					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 
@@ -64,12 +45,12 @@ public class App {
 
 		} else if (element.getName().equals("h")) {
 			String tagName = "";
-			String currentAttr = getAttVal(element, "style-name");
+			String currentAtt = getAttVal(element, "style-name");
 
 			for (Object con : automaticStyle.getContent()) {
 				Element loopEl = (Element) con;
 
-				if (currentAttr.equals(getAttVal(loopEl, "name"))) {
+				if (currentAtt.equals(getAttVal(loopEl, "name"))) {
 					switch (getAttVal(loopEl, "parent-style-name")) {
 					case "Heading_20_1":
 						tagName = "h1";
@@ -89,7 +70,7 @@ public class App {
 				}
 			}
 
-			String createdStyle = createStyle(getStyleList(currentAttr,
+			String createdStyle = createStyle(getStyleList(currentAtt,
 					automaticStyle));
 
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
@@ -98,8 +79,8 @@ public class App {
 
 		} else if (element.getName().equals("p")) {
 
-			String currentAttr = getAttVal(element, "style-name");
-			String createdStyle = createStyle(getStyleList(currentAttr,
+			String currentAtt = getAttVal(element, "style-name");
+			String createdStyle = createStyle(getStyleList(currentAtt,
 					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<div" + createdStyle + ">";
@@ -138,8 +119,9 @@ public class App {
 			Element myEl6 = (Element) element.getContent().get(0);
 			Element pElement = (Element) myEl6.getContent().get(0);
 
-			String currentAttr = getAttVal(pElement, "style-name");
-			String createdStyle = createULStyle(getStyleList(currentAttr,
+			String currentAtt = getAttVal(pElement, "style-name");
+
+			String createdStyle = createULStyle(getStyleList(currentAtt,
 					automaticStyle));
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<ul" + createdStyle + ">";
@@ -160,16 +142,27 @@ public class App {
 	}
 
 	@SuppressWarnings("unchecked")
-	public static List<Attribute> getStyleList(String attName,
+	public static List<Attribute> getStyleList(String attValue,
 			Element automaticStyle) {
 
 		for (Object obj : automaticStyle.getContent()) {
 			Element element = (Element) obj;
 
-			if (attName != null && attName.equals(getAttVal(element, "name"))) {
-				if (element.getContent().size() > 0)
-					return ((Element) element.getContent().get(0))
-							.getAttributes();
+			if (attValue != null && isSameEl(element, "name", attValue)) {
+				if (element.getContent().size() > 0) {
+					List<Attribute> attList = new ArrayList<>();
+
+					for (Object obj2 : element.getContent()) {
+						Element element2 = (Element) obj2;
+
+						for (Attribute att : (List<Attribute>) element2
+								.getAttributes()) {
+							attList.add(att);
+						}
+					}
+
+					return attList;
+				}
 			}
 		}
 
@@ -311,24 +304,58 @@ public class App {
 		return null;
 	}
 
-	public static Element getChildByAttrNameValue(Element element, String name,
-			String value) {
-		for (Object obj : element.getContent()) {
-			Element myEl = ((Element) obj);
+	//
+	// public static Element getChildByAttNameValue(Element element, String
+	// name,
+	// String value) {
+	// for (Object obj : element.getContent()) {
+	// Element el = ((Element) obj);
+	//
+	// if (getAttVal(el, name).equals(value)) {
+	// return el;
+	// }
+	// }
+	//
+	// return null;
+	// }
 
-			if (myEl.getAttributeValue(name, myEl.getNamespace()).equals(value)) {
-				return myEl;
-			}
-		}
-		return null;
+	public static Attribute getAtt(Element element, String attName) {
+		return element.getAttribute(attName, element.getNamespace());
 	}
 
-	public static Attribute getAtt(Element element, String attrName) {
-		return element.getAttribute(attrName, element.getNamespace());
+	public static String getAttVal(Element element, String attName) {
+		return getAtt(element, attName) == null ? null : getAtt(element,
+				attName).getValue();
 	}
 
-	public static String getAttVal(Element element, String attrName) {
-		return getAtt(element, attrName).getValue();
+	public static boolean isSameEl(Element element, String attName,
+			String attValue) {
+		Attribute attribute = getAtt(element, attName);
+
+		if (attValue.equals(attribute.getValue()))
+			return true;
+
+		return false;
 	}
 
+	public static void main(String[] args) throws IOException {
+		openDocumentPackage = new ODPackage(new File("test.odt"));
+
+		rootElement = openDocumentPackage.getTextDocument()
+				.getContentDocument().getRootElement();
+
+		automaticStyle = (Element) getChildByName(rootElement,
+				"automatic-styles");
+		bodyElement = (Element) rootElement.getContent().get(3);
+		textElement = (Element) bodyElement.getContent().get(0);
+
+		// iterating <office:text>
+		for (Object myObj : textElement.getContent())
+			recursiveElement(myObj);
+
+		// Output HTML
+		htmlBuilder();
+		System.out.println(outHTML);
+		saveToFile("test.html", outHTML.toString());
+	}
 }
