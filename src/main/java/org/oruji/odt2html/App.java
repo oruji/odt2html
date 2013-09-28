@@ -22,26 +22,18 @@ public class App {
 	private static Element bodyElement;
 	private static Element textElement;
 
-	public static void recursiveElement(Object obj) {
-		// Loop Condition
-		if (obj.toString().startsWith("[Text: ")) {
-			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
-					.replace(">", "&gt;"));
-			return;
-		}
-
-		Element element = ((Element) obj);
-		String startTag = "";
-		String endTag = "";
-
+	public static String getTagName(Element element) {
 		if (element.getName().equals("span")) {
-			String currentAtt = getAttVal(element, "style-name");
-			String createdStyle = createStyle(getStyleList(currentAtt,
-					automaticStyle));
-			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+			return element.getName();
 
-			startTag = "<span" + createdStyle + ">";
-			endTag = "</span>";
+		} else if (element.getName().equals("p")) {
+			return "div";
+
+		} else if (element.getName().equals("list")) {
+			return "ul";
+
+		} else if (element.getName().equals("list-item")) {
+			return "li";
 
 		} else if (element.getName().equals("h")) {
 			String tagName = "";
@@ -66,37 +58,69 @@ public class App {
 
 					case "Heading_20_4":
 						tagName = "h4";
-						break;	
-						
+						break;
+
 					case "Heading_20_5":
 						tagName = "h5";
 						break;
-						
+
 					case "Heading_20_6":
 						tagName = "h6";
 						break;
-						
+
 					default:
 						break;
 					}
 				}
 			}
 
-			String createdStyle = createStyle(getStyleList(currentAtt,
-					automaticStyle));
+			return tagName;
+
+		}
+		return null;
+	}
+
+	public static void recursiveElement(Object obj) {
+		// Loop Condition
+		if (obj.toString().startsWith("[Text: ")) {
+			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
+					.replace(">", "&gt;"));
+			return;
+		}
+
+		Element element = ((Element) obj);
+		String tagName = "";
+		String startTag = "";
+		String endTag = "";
+
+		tagName = getTagName(element);
+
+		if (element.getName().equals("span")) {
+			String currentAtt = getAttVal(element, "style-name");
+			String createdStyle = createStyle(
+					getStyleList(currentAtt, automaticStyle), element.getName());
+			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
+
+			startTag = "<" + tagName + createdStyle + ">";
+			endTag = "</" + tagName + ">";
+
+		} else if (element.getName().equals("h")) {
+			String currentAtt = getAttVal(element, "style-name");
+			String createdStyle = createStyle(
+					getStyleList(currentAtt, automaticStyle), element.getName());
 
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
 			startTag = "<" + tagName + createdStyle + ">";
 			endTag = "</" + tagName + ">";
 
 		} else if (element.getName().equals("p")) {
-
 			String currentAtt = getAttVal(element, "style-name");
-			String createdStyle = createStyle(getStyleList(currentAtt,
-					automaticStyle));
+			String createdStyle = createStyle(
+					getStyleList(currentAtt, automaticStyle), element.getName());
+
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			startTag = "<div" + createdStyle + ">";
-			endTag = "</div>";
+			startTag = "<" + tagName + createdStyle + ">";
+			endTag = "</" + tagName + ">";
 
 		} else if (element.getName().equals("a")) {
 			String myUrl = element.getAttributeValue("href", Namespace
@@ -109,7 +133,6 @@ public class App {
 				outHTML.append("&nbsp;");
 
 		} else if (element.getName().equals("s")) {
-
 			String spaceNo = getAttVal(element, "c");
 
 			if (spaceNo == null) {
@@ -122,23 +145,21 @@ public class App {
 			}
 
 		} else if (element.getName().equals("list-item")) {
-			startTag = "<li>";
-			endTag = "</li>";
+			startTag = "<" + tagName + ">";
+			endTag = "</" + tagName + ">";
 
 		} else if (element.getName().equals("list")) {
-			startTag = "<ul>";
-
 			Element myEl6 = (Element) element.getContent().get(0);
 			Element pElement = (Element) myEl6.getContent().get(0);
 
 			String currentAtt = getAttVal(pElement, "style-name");
 
-			String createdStyle = createULStyle(getStyleList(currentAtt,
-					automaticStyle));
+			String createdStyle = createStyle(
+					getStyleList(currentAtt, automaticStyle), element.getName());
 			createdStyle = createdStyle.equals("") ? "" : " " + createdStyle;
-			startTag = "<ul" + createdStyle + ">";
 
-			endTag = "</ul>";
+			startTag = "<" + tagName + createdStyle + ">";
+			endTag = "</" + tagName + ">";
 		}
 
 		// start tag
@@ -181,7 +202,7 @@ public class App {
 		return null;
 	}
 
-	public static String createStyle(List<Attribute> attList) {
+	public static String createStyle(List<Attribute> attList, String elementName) {
 		StringBuilder createdStyle = new StringBuilder("");
 
 		if (attList != null && attList.size() > 0) {
@@ -220,56 +241,12 @@ public class App {
 					}
 				}
 
-				if (att.getNamespacePrefix().equals("fo")) {
-					if (!att.getName().equals("text-align")) {
-						createdStyle.append(att.getName() + ":"
-								+ att.getValue() + ";");
-					}
-				}
-			}
-
-			createdStyle.append("'");
-		}
-
-		if (createdStyle.toString().equals("style=''"))
-			createdStyle = new StringBuilder();
-
-		return createdStyle.toString();
-	}
-
-	public static String createULStyle(List<Attribute> attList) {
-		StringBuilder createdStyle = new StringBuilder("");
-
-		if (attList != null && attList.size() > 0) {
-			createdStyle.append("style='");
-
-			for (Attribute att : attList) {
-				if (att.getName().equals("writing-mode")) {
-					switch (att.getValue()) {
-					case "rl-tb":
-						createdStyle.append("direction:rtl;");
-						break;
-
-					case "lr-tb":
-						createdStyle.append("direction:ltr;");
-						break;
-
-					default:
-						break;
-					}
-
-				} else if (att.getName().equals("text-align")) {
-					switch (att.getValue()) {
-					case "start":
-						createdStyle.append("text-align:left;");
-						break;
-
-					case "end":
-						createdStyle.append("text-align:right;");
-						break;
-
-					default:
-						break;
+				if (!elementName.equals("list")) {
+					if (att.getNamespacePrefix().equals("fo")) {
+						if (!att.getName().equals("text-align")) {
+							createdStyle.append(att.getName() + ":"
+									+ att.getValue() + ";");
+						}
 					}
 				}
 			}
