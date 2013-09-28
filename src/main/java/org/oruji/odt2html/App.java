@@ -64,6 +64,18 @@ public class App {
 						tagName = "h3";
 						break;
 
+					case "Heading_20_4":
+						tagName = "h4";
+						break;	
+						
+					case "Heading_20_5":
+						tagName = "h5";
+						break;
+						
+					case "Heading_20_6":
+						tagName = "h6";
+						break;
+						
 					default:
 						break;
 					}
@@ -332,7 +344,7 @@ public class App {
 			String attValue) {
 		Attribute attribute = getAtt(element, attName);
 
-		if (attValue.equals(attribute.getValue()))
+		if (attribute != null && attValue.equals(attribute.getValue()))
 			return true;
 
 		return false;
