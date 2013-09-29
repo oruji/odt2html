@@ -32,8 +32,6 @@ public class App {
 		bodyElement = getChildByName(rootElement, "body");
 		textElement = getChildByName(bodyElement, "text");
 
-		getElements(textElement);
-
 		// iterating <office:text>
 		recursiveElement(textElement);
 
@@ -88,7 +86,7 @@ public class App {
 		// start tag
 		outHTML.append(startTag);
 
-		// body tag
+		// body
 		for (Object obj2 : element.getContent()) {
 			recursiveElement(obj2);
 		}
