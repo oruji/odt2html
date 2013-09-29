@@ -17,12 +17,89 @@ import org.jopendocument.dom.ODPackage;
 public class App {
 	private static StringBuilder outHTML = new StringBuilder("");
 	private static ODPackage openDocumentPackage;
-	private static Element automaticStyle;
+	private static Element automaticStylesElement;
 	private static Element rootElement;
 	private static Element bodyElement;
 	private static Element textElement;
 
-	public static String getAttStr(Element element) {
+	public static void main(String[] args) throws IOException {
+		openDocumentPackage = new ODPackage(new File("test.odt"));
+
+		rootElement = openDocumentPackage.getTextDocument()
+				.getContentDocument().getRootElement();
+
+		automaticStylesElement = getChildByName(rootElement, "automatic-styles");
+		bodyElement = getChildByName(rootElement, "body");
+		textElement = getChildByName(bodyElement, "text");
+
+		// iterating <office:text>
+
+		recursiveElement(textElement);
+
+		// for (Object myObj : textElement.getContent())
+		// recursiveElement(myObj);
+
+		// Output HTML
+		htmlBuilder();
+		System.out.println(outHTML);
+		saveToFile("test.html", outHTML.toString());
+	}
+
+	public static void recursiveElement(Object obj) {
+		// Loop Condition
+		if (obj.toString().startsWith("[Text: ")) {
+			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
+					.replace(">", "&gt;"));
+			return;
+		}
+
+		Element element = ((Element) obj);
+
+		// tab tag
+		if (element.getName().equals("tab")) {
+			for (int i = 0; i < 8; i++)
+				outHTML.append("&nbsp;");
+
+			// space tag
+		} else if (element.getName().equals("s")) {
+			String spaceNo = getAttVal(element, "c");
+
+			if (spaceNo == null) {
+				outHTML.append("&nbsp;");
+
+			} else {
+				for (int i = 0; i < (spaceNo == null ? 0 : Integer
+						.parseInt(spaceNo)); i++)
+					outHTML.append("&nbsp;");
+			}
+		}
+
+		String tagName = "";
+		String startTag = "";
+		String attributeStr = "";
+		String endTag = "";
+
+		tagName = tagNameBuilder(element);
+		attributeStr = attBuilder(element);
+
+		if (tagName != null && !tagName.equals("")) {
+			startTag = "<" + tagName + attributeStr + ">";
+			endTag = "</" + tagName + ">";
+		}
+
+		// start tag
+		outHTML.append(startTag);
+
+		// body tag
+		for (Object obj2 : element.getContent()) {
+			recursiveElement(obj2);
+		}
+
+		// end tag
+		outHTML.append(endTag);
+	}
+
+	public static String attBuilder(Element element) {
 
 		if (element.getName().equals("list")) {
 			Element myEl6 = null;
@@ -34,7 +111,8 @@ public class App {
 				|| element.getName().equals("p")) {
 			String currentAtt = getAttVal(element, "style-name");
 			String createdStyle = createStyle(
-					getStyleList(currentAtt, automaticStyle), element.getName());
+					getStyleList(currentAtt, automaticStylesElement),
+					element.getName());
 
 			return createdStyle.equals("") ? "" : " " + createdStyle;
 
@@ -47,8 +125,8 @@ public class App {
 		return "";
 	}
 
-	public static String getTagName(Element element) {
-		if (element.getName().equals("span")) {
+	public static String tagNameBuilder(Element element) {
+		if (element.getName().equals("span") || element.getName().equals("a")) {
 			return element.getName();
 
 		} else if (element.getName().equals("p")) {
@@ -60,14 +138,11 @@ public class App {
 		} else if (element.getName().equals("list-item")) {
 			return "li";
 
-		} else if (element.getName().equals("a")) {
-			return element.getName();
-
 		} else if (element.getName().equals("h")) {
 			String tagName = "";
 			String currentAtt = getAttVal(element, "style-name");
 
-			for (Object con : automaticStyle.getContent()) {
+			for (Object con : automaticStylesElement.getContent()) {
 				Element loopEl = (Element) con;
 
 				if (currentAtt.equals(getAttVal(loopEl, "name"))) {
@@ -106,59 +181,6 @@ public class App {
 
 		}
 		return "";
-	}
-
-	public static void recursiveElement(Object obj) {
-		// Loop Condition
-		if (obj.toString().startsWith("[Text: ")) {
-			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
-					.replace(">", "&gt;"));
-			return;
-		}
-
-		Element element = ((Element) obj);
-
-		if (element.getName().equals("tab")) {
-			for (int i = 0; i < 8; i++)
-				outHTML.append("&nbsp;");
-
-		} else if (element.getName().equals("s")) {
-			String spaceNo = getAttVal(element, "c");
-
-			if (spaceNo == null) {
-				outHTML.append("&nbsp;");
-
-			} else {
-				for (int i = 0; i < (spaceNo == null ? 0 : Integer
-						.parseInt(spaceNo)); i++)
-					outHTML.append("&nbsp;");
-			}
-
-		}
-
-		String tagName = "";
-		String startTag = "";
-		String attributeStr = "";
-		String endTag = "";
-
-		tagName = getTagName(element);
-		attributeStr = getAttStr(element);
-
-		if (tagName != null && !tagName.equals("")) {
-			startTag = "<" + tagName + attributeStr + ">";
-			endTag = "</" + tagName + ">";
-		}
-
-		// start tag
-		outHTML.append(startTag);
-
-		// body tag
-		for (Object obj2 : element.getContent()) {
-			recursiveElement(obj2);
-		}
-
-		// end tag
-		outHTML.append(endTag);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -312,26 +334,5 @@ public class App {
 			return true;
 
 		return false;
-	}
-
-	public static void main(String[] args) throws IOException {
-		openDocumentPackage = new ODPackage(new File("test.odt"));
-
-		rootElement = openDocumentPackage.getTextDocument()
-				.getContentDocument().getRootElement();
-
-		automaticStyle = (Element) getChildByName(rootElement,
-				"automatic-styles");
-		bodyElement = (Element) rootElement.getContent().get(3);
-		textElement = (Element) bodyElement.getContent().get(0);
-
-		// iterating <office:text>
-		for (Object myObj : textElement.getContent())
-			recursiveElement(myObj);
-
-		// Output HTML
-		htmlBuilder();
-		System.out.println(outHTML);
-		saveToFile("test.html", outHTML.toString());
 	}
 }
