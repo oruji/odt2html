@@ -44,12 +44,13 @@ public class App {
 	public static void recursiveElement(Object obj) {
 		// Loop Condition
 		if (obj instanceof Text) {
-			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
+			Text text = (Text) obj;
+			outHTML.append(text.getValue().replace("<", "&lt;")
 					.replace(">", "&gt;"));
 			return;
 		}
 
-		Element element = ((Element) obj);
+		Element element = (Element) obj;
 
 		// tab tag
 		if (element.getName().equals("tab")) {
