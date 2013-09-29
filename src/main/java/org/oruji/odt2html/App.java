@@ -32,12 +32,10 @@ public class App {
 		bodyElement = getChildByName(rootElement, "body");
 		textElement = getChildByName(bodyElement, "text");
 
+		getElements(textElement);
+
 		// iterating <office:text>
-
 		recursiveElement(textElement);
-
-		// for (Object myObj : textElement.getContent())
-		// recursiveElement(myObj);
 
 		// Output HTML
 		htmlBuilder();
@@ -47,7 +45,7 @@ public class App {
 
 	public static void recursiveElement(Object obj) {
 		// Loop Condition
-		if (obj.toString().startsWith("[Text: ")) {
+		if (obj instanceof Text) {
 			outHTML.append(((Text) obj).getValue().replace("<", "&lt;")
 					.replace(">", "&gt;"));
 			return;
@@ -180,16 +178,12 @@ public class App {
 	public static List<Attribute> getStyleList(String attValue,
 			Element automaticStyle) {
 
-		for (Object obj : automaticStyle.getContent()) {
-			Element element = (Element) obj;
-
+		for (Element element : getElements(automaticStyle)) {
 			if (attValue != null && isSameEl(element, "name", attValue)) {
 				if (element.getContent().size() > 0) {
 					List<Attribute> attList = new ArrayList<>();
 
-					for (Object obj2 : element.getContent()) {
-						Element element2 = (Element) obj2;
-
+					for (Element element2 : getElements(element)) {
 						for (Attribute att : (List<Attribute>) element2
 								.getAttributes()) {
 							attList.add(att);
@@ -295,21 +289,6 @@ public class App {
 		return null;
 	}
 
-	//
-	// public static Element getChildByAttNameValue(Element element, String
-	// name,
-	// String value) {
-	// for (Object obj : element.getContent()) {
-	// Element el = ((Element) obj);
-	//
-	// if (getAttVal(el, name).equals(value)) {
-	// return el;
-	// }
-	// }
-	//
-	// return null;
-	// }
-
 	public static Attribute getAtt(Element element, String attName) {
 		return element.getAttribute(attName, element.getNamespace());
 	}
@@ -327,5 +306,17 @@ public class App {
 			return true;
 
 		return false;
+	}
+
+	public static List<Element> getElements(Element element) {
+		List<Element> elementList = new ArrayList<>();
+
+		for (Object obj : element.getContent()) {
+			if (obj instanceof Element) {
+				elementList.add((Element) obj);
+			}
+		}
+
+		return elementList;
 	}
 }
