@@ -126,20 +126,21 @@ public class App {
 	}
 
 	public static String tagNameBuilder(Element element) {
-		if (element.getName().equals("span") || element.getName().equals("a")) {
+		switch (element.getName()) {
+		case "span":
+		case "a":
 			return element.getName();
 
-		} else if (element.getName().equals("p")) {
+		case "p":
 			return "div";
 
-		} else if (element.getName().equals("list")) {
+		case "list":
 			return "ul";
 
-		} else if (element.getName().equals("list-item")) {
+		case "list-item":
 			return "li";
 
-		} else if (element.getName().equals("h")) {
-			String tagName = "";
+		case "h":
 			String currentAtt = getAttVal(element, "style-name");
 
 			for (Object con : automaticStylesElement.getContent()) {
@@ -148,38 +149,30 @@ public class App {
 				if (currentAtt.equals(getAttVal(loopEl, "name"))) {
 					switch (getAttVal(loopEl, "parent-style-name")) {
 					case "Heading_20_1":
-						tagName = "h1";
-						break;
+						return "h1";
 
 					case "Heading_20_2":
-						tagName = "h2";
-						break;
+						return "h2";
 
 					case "Heading_20_3":
-						tagName = "h3";
-						break;
+						return "h3";
 
 					case "Heading_20_4":
-						tagName = "h4";
-						break;
+						return "h4";
 
 					case "Heading_20_5":
-						tagName = "h5";
-						break;
+						return "h5";
 
 					case "Heading_20_6":
-						tagName = "h6";
-						break;
+						return "h6";
 
 					default:
 						break;
 					}
 				}
 			}
-
-			return tagName;
-
 		}
+
 		return "";
 	}
 
