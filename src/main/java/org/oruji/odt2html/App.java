@@ -204,7 +204,8 @@ public class App {
 			createdStyle.append("style='");
 
 			for (Attribute att : attList) {
-				if (att.getName().equals("font-name")) {
+				if (att.getName().equals("font-name")
+						|| att.getName().equals("font-name-complex")) {
 					createdStyle.append("font-family:" + att.getValue() + ";");
 
 				} else if (att.getName().equals("writing-mode")) {
